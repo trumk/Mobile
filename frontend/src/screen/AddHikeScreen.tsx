@@ -1,12 +1,12 @@
-// AddHikeScreen.tsx
 import React from 'react';
 import { View, Text } from 'react-native';
 import HikeForm from '../components/HikeForm';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Hike } from '../../type';
+import axios from 'axios';
 
 type AddHikeScreenNavigationProp = StackNavigationProp<{
-    'Hike List': undefined;
+    'Hikes': undefined; 
 }>;
 
 type Props = {
@@ -15,9 +15,13 @@ type Props = {
 
 const AddHikeScreen: React.FC<Props> = ({ navigation }) => {
     const handleAddHike = async (hike: Omit<Hike, '_id'>) => {
-        // Gọi API để thêm hike
-        // ...
-        navigation.navigate('Hike List'); // Chuyển đến màn hình danh sách hike
+        try {
+            const response = await axios.post('http://192.168.1.14:5000/api/hikes', hike);
+            console.log('Hike added:', response.data);
+            navigation.navigate('Hikes'); 
+        } catch (error) {
+            console.error('Error adding hike:', error);
+        }
     };
 
     return (
