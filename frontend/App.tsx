@@ -6,12 +6,14 @@ import HomeScreen from './src/screen/HomeScreen';
 import HikeListScreen from './src/screen/HikeListScreen';
 import AddHikeScreen from './src/screen/AddHikeScreen';
 import EditHikeScreen from './src/screen/EditHikeScreen';
+import DetailHikeScreen from './src/screen/DetailHikeScreen';
 
 export type RootStackParamList = {
     Home: undefined;
     Hikes: undefined;
     'Add Hike': undefined;
-    'Edit Hike': { hikeId: string }; // Thêm tham số cho Edit Hike
+    'Edit Hike': { hikeId: string }; 
+    'Detail Hike': { hikeId: string }; 
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -24,6 +26,7 @@ const App = () => {
                 <Stack.Screen name="Hikes" component={HikeListScreen} />
                 <Stack.Screen name="Add Hike" component={AddHikeScreen} />
                 <Stack.Screen name="Edit Hike" component={EditHikeScreen} />
+                <Stack.Screen name="Detail Hike" component={DetailHikeScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

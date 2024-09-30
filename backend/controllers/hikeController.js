@@ -10,6 +10,18 @@ exports.getAllHikes = async (req, res) => {
     }
 };
 
+exports.detailHike = async (req, res) => {
+    try {
+        const hike = await Hike.findById(req.params.id);
+        if (!hike) {
+            return res.status(404).json({ message: 'Hike not found' });
+        }
+        res.json(hike);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // Create new hike
 exports.createHike = async (req, res) => {
     const { name, location, locationEnd, date, parkingAvailable, length, difficulty, description, weather} = req.body;
