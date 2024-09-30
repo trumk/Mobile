@@ -18,7 +18,7 @@ const AddHikeScreen: React.FC<Props> = ({ navigation }) => {
         try {
             const response = await axios.post('http://192.168.1.14:5000/api/hikes', hike);
             console.log('Hike added:', response.data);
-            navigation.navigate('Hikes'); 
+            navigation.navigate('Hikes');
         } catch (error) {
             console.error('Error adding hike:', error);
         }
@@ -26,7 +26,6 @@ const AddHikeScreen: React.FC<Props> = ({ navigation }) => {
 
     return (
         <View>
-            <Text>Add Hike</Text>
             <HikeForm onSubmit={handleAddHike} />
         </View>
     );

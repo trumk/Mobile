@@ -12,10 +12,10 @@ exports.getAllHikes = async (req, res) => {
 
 // Create new hike
 exports.createHike = async (req, res) => {
-    const { name, location, date, parkingAvailable, length, difficulty, description, weather, companion} = req.body;
+    const { name, location, locationEnd, date, parkingAvailable, length, difficulty, description, weather} = req.body;
     try {
         const newHike = new Hike({
-            name, location, date, parkingAvailable, length, difficulty, description, weather, companion
+            name, location, locationEnd, date, parkingAvailable, length, difficulty, description, weather
         });
         await newHike.save();
         res.status(201).json(newHike);
