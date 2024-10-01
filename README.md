@@ -1,1 +1,1 @@
-exprexx, mongo, react native, expo
+express, mongo, react native, expo
