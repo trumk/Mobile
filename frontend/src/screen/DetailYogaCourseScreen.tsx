@@ -23,7 +23,7 @@ const DetailYogaCourseScreen: React.FC<DetailYogaCourseScreenProps> = ({ route, 
     useEffect(() => {
         const fetchCourseDetail = async () => {
             try {
-                const response = await axios.get(`http://192.168.1.14:5000/api/courses/${courseId}`);
+                const response = await axios.get(`http://192.168.1.10:5000/api/courses/${courseId}`);
                 setCourse(response.data);
             } catch (err) {
                 setError('Could not fetch course details.');

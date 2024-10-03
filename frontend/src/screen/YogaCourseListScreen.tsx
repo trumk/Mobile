@@ -7,7 +7,7 @@ import { YogaCourse } from '../../types';
 import axios from 'axios';
 
 type RootStackParamList = {
-    'Edit YogaCourse': { courseId: string; onEditSuccess: () => void }; // Thêm callback vào route params
+    'Edit YogaCourse': { courseId: string; onEditSuccess: () => void }; 
     'Detail YogaCourse': { courseId: string };
 };
 
@@ -20,7 +20,7 @@ const YogaCourseListScreen: React.FC<YogaCourseListScreenProps> = ({ navigation 
 
     const fetchCourses = async () => {
         try {
-            const response = await axios.get('http://192.168.1.14:5000/api/courses');
+            const response = await axios.get('http://192.168.1.10:5000/api/courses');
             setCourses(response.data);
         } catch (error) {
             console.error('Error fetching yoga courses:', error);

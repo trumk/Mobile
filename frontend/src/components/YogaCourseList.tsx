@@ -1,32 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import axios from 'axios';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 type YogaCourse = {
     _id: string;
-    classType: string; 
+    classType: string;
+    teacherName: string;
+    dayOfWeek: string;
+    courseTime: string;
+    location: string;
+    duration: number;
 };
 
 type RootStackParamList = {
-    'Detail YogaCourse': { courseId: string }; 
+    'Detail YogaCourse': { courseId: string };
+    'Edit YogaCourse': { courseId: string; onEditSuccess: () => void };
 };
 
 type YogaCourseListProps = {
     courses: YogaCourse[]; 
-    navigation: any; 
+    navigation: StackNavigationProp<RootStackParamList>;
 };
 
-const YogaCourseList: React.FC<YogaCourseListProps> = ({ navigation }) => {
-    const [courses, setCourses] = useState<YogaCourse[]>([]);
-
-    useEffect(() => {
-        const fetchCourses = async () => {
-            const response = await axios.get('http://192.168.1.14:5000/api/courses'); 
-            setCourses(response.data);
-        };
-        fetchCourses();
-    }, []);
-
+const YogaCourseList: React.FC<YogaCourseListProps> = ({ courses, navigation }) => {
     return (
         <View style={styles.container}>
             <FlatList
@@ -34,12 +30,16 @@ const YogaCourseList: React.FC<YogaCourseListProps> = ({ navigation }) => {
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
                     <View style={styles.courseCard}>
-                        <Text style={styles.courseType}>{item.classType}</Text> 
+                        <Text style={styles.courseType}>{item.classType} - {item.teacherName}</Text>
+                        <Text>Day: {item.dayOfWeek}</Text>
+                        <Text>Time: {item.courseTime}</Text>
+                        <Text>Location: {item.location}</Text>
+                        <Text>Duration: {item.duration} minutes</Text>
                         <TouchableOpacity 
                             style={styles.detailButton} 
                             onPress={() => navigation.navigate('Detail YogaCourse', { courseId: item._id })} 
                         >
-                            <Text style={styles.detailButtonText}>Detail</Text>
+                            <Text style={styles.detailButtonText}>View Details</Text>
                         </TouchableOpacity>
                     </View>
                 )}
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#2a7183', 
         paddingVertical: 10,
         borderRadius: 5,
-        width: '100%', 
-        alignItems: 'center', 
+        alignItems: 'center',
+        marginTop: 10,
     },
     detailButtonText: {
         color: '#ffffff',

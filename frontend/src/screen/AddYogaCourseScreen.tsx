@@ -16,7 +16,7 @@ type Props = {
 const AddYogaCourseScreen: React.FC<Props> = ({ navigation }) => {
     const handleAddYogaCourse = async (course: Omit<YogaCourse, '_id'>) => {
         try {
-            const response = await axios.post('http://192.168.1.14:5000/api/courses', course); 
+            const response = await axios.post('http://192.168.1.10:5000/api/courses', course); 
             console.log('Yoga Course added:', response.data);
             navigation.navigate('YogaCourses'); 
         } catch (error) {
