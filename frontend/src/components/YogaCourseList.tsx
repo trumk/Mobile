@@ -1,45 +1,43 @@
-// components/HikeList.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import axios from 'axios';
-import { StackNavigationProp } from '@react-navigation/stack';
 
-type Hike = {
+type YogaCourse = {
     _id: string;
-    name: string;
+    classType: string; 
 };
 
 type RootStackParamList = {
-    'Detail Hike': { hikeId: string };
+    'Detail YogaCourse': { courseId: string }; 
 };
 
-type HikeListProps = {
-    hikes: Hike[]; 
+type YogaCourseListProps = {
+    courses: YogaCourse[]; 
     navigation: any; 
 };
 
-const HikeList: React.FC<HikeListProps> = ({ navigation }) => {
-    const [hikes, setHikes] = useState<Hike[]>([]);
+const YogaCourseList: React.FC<YogaCourseListProps> = ({ navigation }) => {
+    const [courses, setCourses] = useState<YogaCourse[]>([]);
 
     useEffect(() => {
-        const fetchHikes = async () => {
-            const response = await axios.get('http://192.168.1.14:5000/api/hikes');
-            setHikes(response.data);
+        const fetchCourses = async () => {
+            const response = await axios.get('http://192.168.1.14:5000/api/courses'); 
+            setCourses(response.data);
         };
-        fetchHikes();
+        fetchCourses();
     }, []);
 
     return (
         <View style={styles.container}>
             <FlatList
-                data={hikes}
+                data={courses}
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
-                    <View style={styles.hikeCard}>
-                        <Text style={styles.hikeName}>{item.name}</Text>
+                    <View style={styles.courseCard}>
+                        <Text style={styles.courseType}>{item.classType}</Text> 
                         <TouchableOpacity 
                             style={styles.detailButton} 
-                            onPress={() => navigation.navigate('Detail Hike', { hikeId: item._id })}
+                            onPress={() => navigation.navigate('Detail YogaCourse', { courseId: item._id })} 
                         >
                             <Text style={styles.detailButtonText}>Detail</Text>
                         </TouchableOpacity>
@@ -56,7 +54,7 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f0f4f8',
     },
-    hikeCard: {
+    courseCard: {
         backgroundColor: '#ffffff',
         padding: 15,
         borderRadius: 10,
@@ -70,17 +68,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3,
     },
-    hikeName: {
+    courseType: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#2C3E50',
     },
     detailButton: {
-        backgroundColor: '#2a7183', // Màu khác cho nút "Detail"
+        backgroundColor: '#2a7183', 
         paddingVertical: 10,
         borderRadius: 5,
-        width: '100%', // Đặt chiều rộng là 100%
-        alignItems: 'center', // Căn giữa nội dung trong nút
+        width: '100%', 
+        alignItems: 'center', 
     },
     detailButtonText: {
         color: '#ffffff',
@@ -89,4 +87,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HikeList;
+export default YogaCourseList;

@@ -1,4 +1,3 @@
-// screens/DetailHikeScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
@@ -6,34 +5,34 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 type RootStackParamList = {
-    'Detail Hike': { hikeId: string };
-    'Edit Hike': { hikeId: string };
+    'Detail YogaCourse': { courseId: string };
+    'Edit YogaCourse': { courseId: string };
 };
 
-type DetailHikeScreenProps = {
-    route: RouteProp<RootStackParamList, 'Detail Hike'>;
+type DetailYogaCourseScreenProps = {
+    route: RouteProp<RootStackParamList, 'Detail YogaCourse'>;
     navigation: StackNavigationProp<RootStackParamList>;
 };
 
-const DetailHikeScreen: React.FC<DetailHikeScreenProps> = ({ route, navigation }) => {
-    const { hikeId } = route.params;
-    const [hike, setHike] = useState<any>(null);
+const DetailYogaCourseScreen: React.FC<DetailYogaCourseScreenProps> = ({ route, navigation }) => {
+    const { courseId } = route.params;
+    const [course, setCourse] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchHikeDetail = async () => {
+        const fetchCourseDetail = async () => {
             try {
-                const response = await axios.get(`http://192.168.1.14:5000/api/hikes/${hikeId}`);
-                setHike(response.data);
+                const response = await axios.get(`http://192.168.1.14:5000/api/courses/${courseId}`);
+                setCourse(response.data);
             } catch (err) {
-                setError('Could not fetch hike details.');
+                setError('Could not fetch course details.');
             } finally {
                 setLoading(false);
             }
         };
-        fetchHikeDetail();
-    }, [hikeId]);
+        fetchCourseDetail();
+    }, [courseId]);
 
     const formatDate = (isoString: string) => {
         return isoString.split('T')[0]; 
@@ -41,17 +40,17 @@ const DetailHikeScreen: React.FC<DetailHikeScreenProps> = ({ route, navigation }
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://192.168.1.14:5000/api/hikes/${hikeId}`);
-            Alert.alert('Success', 'Hike deleted successfully', [
+            await axios.delete(`http://192.168.1.14:5000/api/courses/${courseId}`);
+            Alert.alert('Success', 'Yoga course deleted successfully', [
                 { text: 'OK', onPress: () => navigation.goBack() },
             ]);
         } catch (err) {
-            Alert.alert('Error', 'Could not delete hike');
+            Alert.alert('Error', 'Could not delete yoga course');
         }
     };
 
     const confirmDelete = () => {
-        Alert.alert('Confirm Delete', 'Are you sure you want to delete this hike?', [
+        Alert.alert('Confirm Delete', 'Are you sure you want to delete this yoga course?', [
             { text: 'Cancel', style: 'cancel' },
             { text: 'OK', onPress: handleDelete },
         ]);
@@ -75,19 +74,19 @@ const DetailHikeScreen: React.FC<DetailHikeScreenProps> = ({ route, navigation }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{hike.name || 'No Name Available'}</Text>
-            <Text style={styles.details}>Location: {hike.location || 'N/A'}</Text>
-            <Text style={styles.details}>End Location: {hike.locationEnd || 'N/A'}</Text>
-            <Text style={styles.details}>Date: {formatDate(hike.date) || 'N/A'}</Text>
-            <Text style={styles.details}>Parking Available: {hike.parkingAvailable ? 'Yes' : 'No'}</Text>
-            <Text style={styles.details}>Length: {hike.length || 'N/A'} km</Text>
-            <Text style={styles.details}>Difficulty: {hike.difficulty || 'N/A'}</Text>
-            <Text style={styles.details}>Weather: {hike.weather || 'N/A'}</Text>
-            <Text style={styles.details}>Description: {hike.description || 'No Description Available'}</Text>
+            <Text style={styles.title}>{course.classType || 'No Class Type Available'}</Text>
+            <Text style={styles.details}>Day of the Week: {course.dayOfWeek || 'N/A'}</Text>
+            <Text style={styles.details}>Time: {course.courseTime || 'N/A'}</Text>
+            <Text style={styles.details}>Capacity: {course.capacity || 'N/A'} persons</Text>
+            <Text style={styles.details}>Duration: {course.duration || 'N/A'} minutes</Text>
+            <Text style={styles.details}>Price per Class: £{course.pricePerClass || 'N/A'}</Text>
+            <Text style={styles.details}>Teacher: {course.teacherName || 'N/A'}</Text>
+            <Text style={styles.details}>Location: {course.location || 'N/A'}</Text>
+            <Text style={styles.details}>Description: {course.description || 'No Description Available'}</Text>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity 
                     style={[styles.button, styles.editButton]} 
-                    onPress={() => navigation.navigate('Edit Hike', { hikeId })}
+                    onPress={() => navigation.navigate('Edit YogaCourse', { courseId })}
                 >
                     <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
@@ -161,4 +160,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default DetailHikeScreen;
+export default DetailYogaCourseScreen;

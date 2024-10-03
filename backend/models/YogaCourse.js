@@ -8,7 +8,6 @@ const YogaCourseSchema = new mongoose.Schema({
     pricePerClass: { type: Number, required: true }, 
     classType: { type: String, required: true },
     description: { type: String }, 
-    additionalNotes: { type: String }, 
     teacherName: { type: String, required: true }, 
     location: { type: String, required: true } 
 });

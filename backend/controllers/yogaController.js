@@ -22,7 +22,7 @@ exports.detailCourse = async (req, res) => {
 };
 
 exports.createCourse = async (req, res) => {
-    const { dayOfWeek, courseTime, capacity, duration, pricePerClass, classType, description, additionalNotes, teacherName, location } = req.body;
+    const { dayOfWeek, courseTime, capacity, duration, pricePerClass, classType, description, teacherName, location } = req.body;
     try {
         const newCourse = new YogaCourse({
             dayOfWeek, 
@@ -32,7 +32,6 @@ exports.createCourse = async (req, res) => {
             pricePerClass, 
             classType, 
             description, 
-            additionalNotes, 
             teacherName, 
             location
         });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 
@@ -11,15 +11,15 @@ type HomeScreenProps = {
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Welcome to Hike App</Text>
-            <Text style={styles.subtitle}>Your adventure begins here!</Text>
+            <Text style={styles.title}>Welcome to Yoga App</Text>
+            <Text style={styles.subtitle}>Find your balance and peace with yoga courses!</Text>
 
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Hikes')}>
-                <Text style={styles.buttonText}>View Hikes</Text>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('YogaCourses')}>
+                <Text style={styles.buttonText}>View Yoga Courses</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Add Hike')}>
-                <Text style={styles.buttonText}>Add New Hike</Text>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Add YogaCourse')}>
+                <Text style={styles.buttonText}>Add New Yoga Course</Text>
             </TouchableOpacity>
         </View>
     );
