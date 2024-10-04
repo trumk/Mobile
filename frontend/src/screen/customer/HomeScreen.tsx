@@ -1,10 +1,23 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Navbar from '../../components/Navbar'; 
+import Navbar from '../../components/Navbar';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../../App';
+
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC = () => {
+    const navigation = useNavigation<HomeScreenNavigationProp>();
+
     const handleLinkPress = (link: string) => {
-        console.log(`${link} link pressed`);
+        if (link === 'Login') {
+            navigation.navigate('Login'); 
+        } else if (link === 'Profile') {
+            navigation.navigate('Profile'); 
+        } else {
+            console.log(`${link} link pressed`); 
+        }
     };
 
     return (

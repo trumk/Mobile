@@ -9,6 +9,7 @@ import DetailYogaCourseScreen from './src/screen/admin/DetailYogaCourseScreen';
 import LoginScreen from './src/screen/LoginScreen';
 import RegisterScreen from './src/screen/RegisterScreen';
 import HomeScreenAdmin from './src/screen/admin/HomeScreenAdmin';
+import ProfileScreen from './src/screen/customer/ProfileScreen';
 
 export type RootStackParamList = {
     Home: undefined;
@@ -18,6 +19,7 @@ export type RootStackParamList = {
     'Detail YogaCourse': { courseId: string }; 
     Login: undefined;
     Register: undefined;
+    Profile: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -37,6 +39,7 @@ const App = () => {
                 <Stack.Screen name="Detail YogaCourse" component={DetailYogaCourseScreen} />
                 {/* customer */}
                 <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Profile" component={ProfileScreen} /> 
             </Stack.Navigator>
         </NavigationContainer>
     );
