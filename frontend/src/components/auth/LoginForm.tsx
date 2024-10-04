@@ -14,7 +14,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onRegisterNavigat
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('http://192.168.1.10:5000/api/auth/login', {
+            const response = await axios.post('http://192.168.1.14:5000/api/auth/login', {
                 username,
                 password,
             });

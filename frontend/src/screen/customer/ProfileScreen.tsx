@@ -9,7 +9,7 @@ const ProfileScreen: React.FC = () => {
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                const response = await axios.get('http://192.168.1.10:5000/api/auth/user'); 
+                const response = await axios.get('http://192.168.1.14:5000/api/auth/user'); 
                 setUser(response.data.user);
                 setLoading(false);
             } catch (error) {

@@ -1,37 +1,45 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
-  Button,
-  Platform,
+  TouchableOpacity,
   StyleSheet,
   ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import RNPickerSelect from "react-native-picker-select";
-import { YogaCourse } from "../../../types"; 
+import { YogaCourse } from "../../../types";
 
 type YogaCourseFormProps = {
   course?: YogaCourse;
   onSubmit: (course: Omit<YogaCourse, "_id">) => void;
 };
 
-const YogaCourseForm: React.FC<YogaCourseFormProps> = ({ course, onSubmit }) => {
+const YogaCourseForm: React.FC<YogaCourseFormProps> = ({
+  course,
+  onSubmit,
+}) => {
   const [dayOfWeek, setDayOfWeek] = useState(course?.dayOfWeek || "");
-  const [courseTime, setCourseTime] = useState(course?.courseTime || "");
+  const [courseTime, setCourseTime] = useState<Date | undefined>(
+    course ? new Date(course.courseTime) : undefined
+  );
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [capacity, setCapacity] = useState(course?.capacity || 0);
   const [duration, setDuration] = useState(course?.duration || 60);
-  const [pricePerClass, setPricePerClass] = useState(course?.pricePerClass || 0);
+  const [pricePerClass, setPricePerClass] = useState(
+    course?.pricePerClass || 0
+  );
   const [classType, setClassType] = useState(course?.classType || "Flow Yoga");
   const [description, setDescription] = useState(course?.description || "");
   const [teacherName, setTeacherName] = useState(course?.teacherName || "");
   const [location, setLocation] = useState(course?.location || "");
 
   const handleSubmit = () => {
+    const formattedCourseTime = courseTime?.toISOString() || "";
     onSubmit({
       dayOfWeek,
-      courseTime,
+      courseTime: formattedCourseTime,
       capacity,
       duration,
       pricePerClass,
@@ -42,22 +50,52 @@ const YogaCourseForm: React.FC<YogaCourseFormProps> = ({ course, onSubmit }) => 
     });
   };
 
+  const handleTimeChange = (event: any, selectedTime?: Date) => {
+    setShowTimePicker(false);
+    if (selectedTime) {
+      setCourseTime(selectedTime);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <Text style={styles.label}>Day of the Week:</Text>
-        <TextInput
-          style={styles.input}
+        <RNPickerSelect
+          onValueChange={setDayOfWeek}
+          items={[
+            { label: "Monday", value: "Monday" },
+            { label: "Tuesday", value: "Tuesday" },
+            { label: "Wednesday", value: "Wednesday" },
+            { label: "Thursday", value: "Thursday" },
+            { label: "Friday", value: "Friday" },
+            { label: "Saturday", value: "Saturday" },
+            { label: "Sunday", value: "Sunday" },
+          ]}
           value={dayOfWeek}
-          onChangeText={setDayOfWeek}
+          style={pickerSelectStyles}
+          placeholder={{ label: "Select a day", value: null }}
         />
 
         <Text style={styles.label}>Course Time:</Text>
-        <TextInput
-          style={styles.input}
-          value={courseTime}
-          onChangeText={setCourseTime}
-        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setShowTimePicker(true)}
+        >
+          <Text style={styles.buttonText}>
+            {courseTime
+              ? `Selected: ${courseTime.toLocaleTimeString()}`
+              : "Pick Time"}
+          </Text>
+        </TouchableOpacity>
+        {showTimePicker && (
+          <DateTimePicker
+            value={courseTime || new Date()}
+            mode="time"
+            display="default"
+            onChange={handleTimeChange}
+          />
+        )}
 
         <Text style={styles.label}>Capacity:</Text>
         <TextInput
@@ -65,15 +103,23 @@ const YogaCourseForm: React.FC<YogaCourseFormProps> = ({ course, onSubmit }) => 
           value={capacity ? capacity.toString() : ""}
           keyboardType="numeric"
           onChangeText={(value) => setCapacity(Number(value))}
+          placeholder="Enter capacity"
         />
 
         <Text style={styles.label}>Duration (minutes):</Text>
-        <TextInput
-          style={styles.input}
-          value={duration ? duration.toString() : ""}
-          keyboardType="numeric"
-          onChangeText={(value) => setDuration(Number(value))}
+        <RNPickerSelect
+          onValueChange={(value) => setDuration(value)}
+          items={[
+            { label: "30 minutes", value: 30 },
+            { label: "60 minutes", value: 60 },
+            { label: "90 minutes", value: 90 },
+            { label: "120 minutes", value: 120 },
+          ]}
+          value={duration}
+          style={pickerSelectStyles}
+          placeholder={{ label: "Select duration", value: null }}
         />
+        <Text style={styles.textSmall}>Duration: {duration} minutes</Text>
 
         <Text style={styles.label}>Price per Class (£):</Text>
         <TextInput
@@ -81,6 +127,7 @@ const YogaCourseForm: React.FC<YogaCourseFormProps> = ({ course, onSubmit }) => 
           value={pricePerClass ? pricePerClass.toString() : ""}
           keyboardType="numeric"
           onChangeText={(value) => setPricePerClass(Number(value))}
+          placeholder="Enter price"
         />
 
         <Text style={styles.label}>Class Type:</Text>
@@ -100,6 +147,7 @@ const YogaCourseForm: React.FC<YogaCourseFormProps> = ({ course, onSubmit }) => 
           style={styles.input}
           value={description}
           onChangeText={setDescription}
+          placeholder="Enter description"
         />
 
         <Text style={styles.label}>Teacher Name:</Text>
@@ -107,6 +155,7 @@ const YogaCourseForm: React.FC<YogaCourseFormProps> = ({ course, onSubmit }) => 
           style={styles.input}
           value={teacherName}
           onChangeText={setTeacherName}
+          placeholder="Enter teacher's name"
         />
 
         <Text style={styles.label}>Location:</Text>
@@ -114,9 +163,12 @@ const YogaCourseForm: React.FC<YogaCourseFormProps> = ({ course, onSubmit }) => 
           style={styles.input}
           value={location}
           onChangeText={setLocation}
+          placeholder="Enter location"
         />
 
-        <Button title="Submit" onPress={handleSubmit} />
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Submit</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -128,7 +180,13 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   label: {
     fontSize: 16,
@@ -137,34 +195,56 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   input: {
-    height: 40,
+    height: 45,
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
+    borderRadius: 8,
+    paddingHorizontal: 12,
     marginBottom: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f9f9",
+  },
+  button: {
+    backgroundColor: "#1e90ff",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  textSmall: {
+    fontSize: 14,
+    marginVertical: 8,
+    color: "#666",
+  },
+  submitButton: {
+    backgroundColor: "#28a745",
+    borderRadius: 8,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 
 const pickerSelectStyles = {
-  inputIOS: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-  },
   inputAndroid: {
-    height: 40,
+    height: 45,
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
+    borderRadius: 8,
+    paddingHorizontal: 12,
     marginBottom: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f9f9",
   },
 };
 

@@ -24,7 +24,7 @@ const EditYogaCourseScreen: React.FC<Props> = ({ navigation, route }) => {
 
     useEffect(() => {
         const fetchCourse = async () => {
-            const response = await axios.get(`http://192.168.1.10:5000/api/admin/courses/${route.params.courseId}`);
+            const response = await axios.get(`http://192.168.1.14:5000/api/admin/courses/${route.params.courseId}`);
             setCourse(response.data);
         };
         fetchCourse();
@@ -32,7 +32,7 @@ const EditYogaCourseScreen: React.FC<Props> = ({ navigation, route }) => {
 
     const handleEditYogaCourse = async (updatedCourse: Omit<YogaCourse, '_id'>) => {
         try {
-            await axios.put(`http://192.168.1.10:5000/api/courses/${route.params.courseId}`, updatedCourse);
+            await axios.put(`http://192.168.1.14:5000/api/admin/courses/${route.params.courseId}`, updatedCourse);
             navigation.navigate('YogaCourses');
         } catch (error) {
             console.error('Failed to update yoga course:', error);

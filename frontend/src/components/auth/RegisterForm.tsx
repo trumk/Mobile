@@ -21,7 +21,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
         }
 
         try {
-            await axios.post('http://192.168.1.10:5000/api/auth/register', {
+            await axios.post('http://192.168.1.14:5000/api/auth/register', {
                 username,
                 email,
                 password,

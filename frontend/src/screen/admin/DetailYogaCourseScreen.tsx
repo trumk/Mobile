@@ -23,7 +23,7 @@ const DetailYogaCourseScreen: React.FC<DetailYogaCourseScreenProps> = ({ route, 
     useEffect(() => {
         const fetchCourseDetail = async () => {
             try {
-                const response = await axios.get(`http://192.168.1.10:5000/api/admin/courses/${courseId}`);
+                const response = await axios.get(`http://192.168.1.14:5000/api/admin/courses/${courseId}`);
                 setCourse(response.data);
             } catch (err) {
                 setError('Could not fetch course details.');
@@ -34,13 +34,14 @@ const DetailYogaCourseScreen: React.FC<DetailYogaCourseScreenProps> = ({ route, 
         fetchCourseDetail();
     }, [courseId]);
 
-    const formatDate = (isoString: string) => {
-        return isoString.split('T')[0]; 
+    const formatDateTime = (isoString: string) => {
+        const date = new Date(isoString);
+        return date.toLocaleString();
     };
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://192.168.1.14:5000/api/courses/${courseId}`);
+            await axios.delete(`http://192.168.1.14:5000/api/admin/courses/${courseId}`);
             Alert.alert('Success', 'Yoga course deleted successfully', [
                 { text: 'OK', onPress: () => navigation.goBack() },
             ]);
@@ -76,7 +77,7 @@ const DetailYogaCourseScreen: React.FC<DetailYogaCourseScreenProps> = ({ route, 
         <View style={styles.container}>
             <Text style={styles.title}>{course.classType || 'No Class Type Available'}</Text>
             <Text style={styles.details}>Day of the Week: {course.dayOfWeek || 'N/A'}</Text>
-            <Text style={styles.details}>Time: {course.courseTime || 'N/A'}</Text>
+            <Text style={styles.details}>Time: {course.courseTime ? formatDateTime(course.courseTime) : 'N/A'}</Text>
             <Text style={styles.details}>Capacity: {course.capacity || 'N/A'} persons</Text>
             <Text style={styles.details}>Duration: {course.duration || 'N/A'} minutes</Text>
             <Text style={styles.details}>Price per Class: £{course.pricePerClass || 'N/A'}</Text>
@@ -84,16 +85,13 @@ const DetailYogaCourseScreen: React.FC<DetailYogaCourseScreenProps> = ({ route, 
             <Text style={styles.details}>Location: {course.location || 'N/A'}</Text>
             <Text style={styles.details}>Description: {course.description || 'No Description Available'}</Text>
             <View style={styles.buttonContainer}>
-                <TouchableOpacity 
-                    style={[styles.button, styles.editButton]} 
+                <TouchableOpacity
+                    style={[styles.button, styles.editButton]}
                     onPress={() => navigation.navigate('Edit YogaCourse', { courseId })}
                 >
                     <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                    style={[styles.button, styles.deleteButton]} 
-                    onPress={confirmDelete}
-                >
+                <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={confirmDelete}>
                     <Text style={styles.buttonText}>Delete</Text>
                 </TouchableOpacity>
             </View>
@@ -105,13 +103,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#f0f4f8',
+        backgroundColor: '#ffffff',
         borderRadius: 10,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
         shadowRadius: 6,
-        elevation: 5,
+        elevation: 3,
     },
     center: {
         flex: 1,
@@ -119,43 +117,45 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
         color: '#1E5B75',
         marginBottom: 20,
+        textAlign: 'center',
     },
     details: {
-        fontSize: 16,
-        marginBottom: 10,
+        fontSize: 18,
+        marginBottom: 12,
         color: '#34495E',
+        lineHeight: 26,
     },
     errorText: {
         fontSize: 18,
         color: 'red',
     },
     buttonContainer: {
-        marginTop: 20,
+        marginTop: 30,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
     button: {
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 25,
+        paddingVertical: 15,
+        paddingHorizontal: 25,
+        borderRadius: 30,
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 3,
-        width: '48%',
+        width: '45%',
     },
     editButton: {
         backgroundColor: '#1E5B75',
     },
     deleteButton: {
-        backgroundColor: 'red',
+        backgroundColor: '#E74C3C',
     },
     buttonText: {
-        color: '#fff',
-        fontWeight: 'bold',
+        color: '#ffffff',
+        fontWeight: '600',
         fontSize: 16,
     },
 });
