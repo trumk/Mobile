@@ -1,30 +1,33 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const courseRoutes = require('./routes/courseRoutes');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const authRoutes = require('./routes/userRoutes');
+const courseRoutes = require('./routes/courseRoutes'); 
 require('dotenv').config();
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
-// Routes
-app.use('/api', courseRoutes);
-app.use((err, req, res, next) => {
-    if (err.name === 'ValidationError') {
-        console.error('Validation Error:', err); 
-        return res.status(400).send({ error: 'Invalid request data' });
-    }
-    next(err);
-});
+
+app.use(session({
+    secret: process.env.SESSION_SECRET, 
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } 
+}));
 
 
-// Connect to MongoDB
+app.use('/api/auth', authRoutes); 
+app.use('/api/admin', courseRoutes); 
+
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch((err) => console.log(err));
 
 module.exports = app;
-    

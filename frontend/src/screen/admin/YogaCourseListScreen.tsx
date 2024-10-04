@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import YogaCourseList from '../components/YogaCourseList';
+import YogaCourseList from '../../components/YogaCourseList';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
-import { YogaCourse } from '../../types';
+import { YogaCourse } from '../../../types';
 import axios from 'axios';
 
 type RootStackParamList = {
@@ -20,7 +20,7 @@ const YogaCourseListScreen: React.FC<YogaCourseListScreenProps> = ({ navigation 
 
     const fetchCourses = async () => {
         try {
-            const response = await axios.get('http://192.168.1.10:5000/api/courses');
+            const response = await axios.get('http://192.168.1.10:5000/api/admin/courses');
             setCourses(response.data);
         } catch (error) {
             console.error('Error fetching yoga courses:', error);

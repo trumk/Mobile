@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import RNPickerSelect from "react-native-picker-select";
-import { YogaCourse } from "../../types"; 
+import { YogaCourse } from "../../../types"; 
 
 type YogaCourseFormProps = {
   course?: YogaCourse;

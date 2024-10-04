@@ -1,11 +1,13 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from './src/screen/HomeScreen';
-import YogaCourseListScreen from './src/screen/YogaCourseListScreen';
-import AddYogaCourseScreen from './src/screen/AddYogaCourseScreen';
-import EditYogaCourseScreen from './src/screen/EditYogaCourseScreen';
-import DetailYogaCourseScreen from './src/screen/DetailYogaCourseScreen';
+import HomeScreen from './src/screen/admin/HomeScreenAdmin';
+import YogaCourseListScreen from './src/screen/admin/YogaCourseListScreen';
+import AddYogaCourseScreen from './src/screen/admin/AddYogaCourseScreen';
+import EditYogaCourseScreen from './src/screen/admin/EditYogaCourseScreen';
+import DetailYogaCourseScreen from './src/screen/admin/DetailYogaCourseScreen';
+import LoginScreen from './src/screen/LoginScreen';
+import RegisterScreen from './src/screen/RegisterScreen';
 
 export type RootStackParamList = {
     Home: undefined;
@@ -13,6 +15,8 @@ export type RootStackParamList = {
     'Add YogaCourse': undefined;
     'Edit YogaCourse': { courseId: string }; 
     'Detail YogaCourse': { courseId: string }; 
+    Login: undefined;
+    Register: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -20,12 +24,17 @@ const Stack = createStackNavigator<RootStackParamList>();
 const App = () => {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Home">
-                <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Navigator initialRouteName="Login">
+                {/* auth */}
+                <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen name="Register" component={RegisterScreen} />
+                {/* admin */}
                 <Stack.Screen name="YogaCourses" component={YogaCourseListScreen} />
                 <Stack.Screen name="Add YogaCourse" component={AddYogaCourseScreen} />
                 <Stack.Screen name="Edit YogaCourse" component={EditYogaCourseScreen} />
                 <Stack.Screen name="Detail YogaCourse" component={DetailYogaCourseScreen} />
+                {/* customer */}
+                <Stack.Screen name="Home" component={HomeScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

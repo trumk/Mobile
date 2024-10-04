@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import YogaCourseEdit from '../components/YogaCourseEdit'; 
+import YogaCourseEdit from '../../components/admin/YogaCourseEdit'; 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
-import { YogaCourse } from '../../types'; 
+import { YogaCourse } from '../../../types'; 
 import axios from 'axios';
 
 type EditYogaCourseScreenNavigationProp = StackNavigationProp<{
@@ -24,7 +24,7 @@ const EditYogaCourseScreen: React.FC<Props> = ({ navigation, route }) => {
 
     useEffect(() => {
         const fetchCourse = async () => {
-            const response = await axios.get(`http://192.168.1.10:5000/api/courses/${route.params.courseId}`);
+            const response = await axios.get(`http://192.168.1.10:5000/api/admin/courses/${route.params.courseId}`);
             setCourse(response.data);
         };
         fetchCourse();
