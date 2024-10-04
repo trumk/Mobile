@@ -6,7 +6,8 @@ import LoginForm from '../components/auth/LoginForm';
 
 type RootStackParamList = {
     Home: undefined;
-    YogaCourses: undefined;
+    "Admin Homepage": undefined;
+    Register: undefined;
 };
 
 interface LoginScreenProps {
@@ -16,20 +17,23 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     const handleLoginSuccess = (role: string) => {
         if (role === 'admin') {
-            navigation.navigate('YogaCourses'); 
-        } else if (role === 'customer') {
-            navigation.navigate('Home'); 
+            navigation.navigate('Admin Homepage');
         } else {
-            Alert.alert('Login Error', 'Invalid user role');
+            navigation.navigate('Home');
         }
     };
 
+    const handleRegisterNavigate = () => {
+        navigation.navigate('Register'); 
+    };
+
     return (
-        <View style={styles.container}>
-            <LoginForm onLoginSuccess={handleLoginSuccess} />
+        <View style={{ flex: 1 }}>
+            <LoginForm onLoginSuccess={handleLoginSuccess} onRegisterNavigate={handleRegisterNavigate} />
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {

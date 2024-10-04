@@ -8,7 +8,7 @@ type HomeScreenProps = {
     route: RouteProp<any, any>;
 };
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+const HomeScreenAdmin: React.FC<HomeScreenProps> = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Welcome to Yoga App</Text>
@@ -61,4 +61,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HomeScreen;
+export default HomeScreenAdmin;
