@@ -2,11 +2,11 @@ import React from 'react';
 import { View } from 'react-native';
 import YogaCourseForm from '../../components/admin/YogaCourseForm'; 
 import { StackNavigationProp } from '@react-navigation/stack';
-import { YogaCourse } from '../../../types'; 
-import axios from 'axios';
+import { YogaCourse } from '../../../types';
+import { addYogaCourse } from '../apiRequest';
 
 type AddYogaCourseScreenNavigationProp = StackNavigationProp<{
-    'YogaCourses': undefined; 
+    'YogaCourses': undefined;
 }>;
 
 type Props = {
@@ -16,9 +16,9 @@ type Props = {
 const AddYogaCourseScreen: React.FC<Props> = ({ navigation }) => {
     const handleAddYogaCourse = async (course: Omit<YogaCourse, '_id'>) => {
         try {
-            const response = await axios.post('http://192.168.1.14:5000/api/admin/courses', course); 
-            console.log('Yoga Course added:', response.data);
-            navigation.navigate('YogaCourses'); 
+            const response = await addYogaCourse(course);
+            console.log('Yoga Course added:', response);
+            navigation.navigate('YogaCourses');
         } catch (error) {
             console.error('Error adding yoga course:', error);
         }

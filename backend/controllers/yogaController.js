@@ -66,3 +66,58 @@ exports.deleteCourse = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.joinCourse = async (req, res) => {
+    try {
+        const course = await YogaCourse.findById(req.params.id);
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found' });
+        }
+        
+        if (course.capacity <= 0) {
+            return res.status(400).json({ message: 'Course is full' });
+        }
+
+        course.capacity -= 1; 
+        await course.save();
+
+        res.json({ message: 'Successfully joined the course', course });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.searchCourses = async (req, res) => {
+    const { search } = req.query;
+    try {
+        const courses = await YogaCourse.find({
+            $or: [
+                { classType: { $regex: search, $options: 'i' } },
+                { teacherName: { $regex: search, $options: 'i' } } 
+            ]
+        });
+        res.json(courses);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.filterCourses = async (req, res) => {
+    const { courseTime, classType } = req.query;
+    let filters = {};
+
+    if (courseTime) {
+        filters.courseTime = { $gte: new Date(courseTime) }; 
+    }
+
+    if (classType) {
+        filters.classType = classType; 
+    }
+
+    try {
+        const courses = await YogaCourse.find(filters);
+        res.json(courses);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

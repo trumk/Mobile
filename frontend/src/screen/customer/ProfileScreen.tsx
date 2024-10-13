@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
-import axios from 'axios';
-
+import { fetchUserDetails } from '../apiRequest'; 
 const ProfileScreen: React.FC = () => {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        const fetchUserDetails = async () => {
+        const getUserDetails = async () => {
             try {
-                const response = await axios.get('http://192.168.1.14:5000/api/auth/user'); 
-                setUser(response.data.user);
+                const fetchedUser = await fetchUserDetails();
+                setUser(fetchedUser);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching user details:', error);
@@ -18,7 +17,7 @@ const ProfileScreen: React.FC = () => {
             }
         };
 
-        fetchUserDetails();
+        getUserDetails();
     }, []);
 
     if (loading) {

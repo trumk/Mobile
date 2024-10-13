@@ -4,7 +4,7 @@ import YogaCourseList from '../../components/YogaCourseList';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { YogaCourse } from '../../../types';
-import axios from 'axios';
+import { fetchCourses } from '../apiRequest'; 
 
 type RootStackParamList = {
     'Edit YogaCourse': { courseId: string; onEditSuccess: () => void }; 
@@ -18,10 +18,10 @@ type YogaCourseListScreenProps = {
 const YogaCourseListScreen: React.FC<YogaCourseListScreenProps> = ({ navigation }) => {
     const [courses, setCourses] = useState<YogaCourse[]>([]);
 
-    const fetchCourses = async () => {
+    const loadCourses = async () => {
         try {
-            const response = await axios.get('http://192.168.1.14:5000/api/admin/courses');
-            setCourses(response.data);
+            const data = await fetchCourses(); 
+            setCourses(data);
         } catch (error) {
             console.error('Error fetching yoga courses:', error);
         }
@@ -29,13 +29,9 @@ const YogaCourseListScreen: React.FC<YogaCourseListScreenProps> = ({ navigation 
 
     useFocusEffect(
         useCallback(() => {
-            fetchCourses();
+            loadCourses();
         }, [])
     );
-
-    const handleEditSuccess = () => {
-        fetchCourses(); 
-    };
 
     return (
         <View style={styles.screenContainer}>

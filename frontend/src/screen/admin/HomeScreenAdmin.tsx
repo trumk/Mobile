@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import axios from 'axios';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
+import { fetchUsers, fetchCourses } from '../apiRequest'; 
 
 type HomeScreenProps = {
     navigation: StackNavigationProp<any>;
@@ -16,18 +16,18 @@ const HomeScreenAdmin: React.FC<HomeScreenProps> = ({ navigation }) => {
     const [error, setError] = useState<string | null>(null);
 
     const fetchData = async () => {
-        setLoading(true); 
+        setLoading(true);
         try {
-            const usersResponse = await axios.get('http://192.168.1.14:5000/api/auth/allUser');
-            const coursesResponse = await axios.get('http://192.168.1.14:5000/api/admin/courses');
+            const usersResponse = await fetchUsers(); 
+            const coursesResponse = await fetchCourses(); 
 
-            setUsersCount(usersResponse.data.length);
-            setCoursesCount(coursesResponse.data.length);
+            setUsersCount(usersResponse.length);
+            setCoursesCount(coursesResponse.length);
             setError(null);
         } catch (err) {
             setError('Error fetching data');
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     };
 

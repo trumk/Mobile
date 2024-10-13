@@ -1,5 +1,14 @@
 const express = require('express');
-const { getAllCourses, createCourse, updateCourse, deleteCourse, detailCourse } = require('../controllers/yogaController');
+const { 
+    getAllCourses, 
+    createCourse, 
+    updateCourse, 
+    deleteCourse, 
+    detailCourse, 
+    joinCourse, 
+    searchCourses, 
+    filterCourses 
+} = require('../controllers/yogaController');
 const router = express.Router();
 
 const checkAdmin = (req, res, next) => {
@@ -9,12 +18,16 @@ const checkAdmin = (req, res, next) => {
     next();
 };
 
-router.get('/courses', getAllCourses);       
-router.get('/courses/:id', detailCourse);     
+// Public routes
+router.get('/courses', getAllCourses);          
+router.get('/courses/:id', detailCourse);       
+router.post('/courses/:id/join', joinCourse);   
+router.get('/courses/search', searchCourses);   
+router.get('/courses/filter', filterCourses);    
 
-// admin only
+// Admin-only routes
 router.post('/courses', checkAdmin, createCourse);     
 router.put('/courses/:id', checkAdmin, updateCourse);   
-router.delete('/courses/:id', checkAdmin, deleteCourse);
+router.delete('/courses/:id', checkAdmin, deleteCourse); 
 
 module.exports = router;

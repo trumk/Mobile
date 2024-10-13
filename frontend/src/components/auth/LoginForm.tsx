@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import { View, TextInput, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { login } from '../../screen/apiRequest'; 
 
 interface LoginFormProps {
     onLoginSuccess: (role: string) => void;
@@ -14,12 +14,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onRegisterNavigat
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('http://192.168.1.14:5000/api/auth/login', {
-                username,
-                password,
-            });
-
-            if (response.data.role === 'admin') {
+            const response = await login(username, password); 
+            if (response.role === 'admin') {
                 onLoginSuccess('admin');
             } else {
                 onLoginSuccess('customer');
@@ -32,7 +28,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onRegisterNavigat
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Login</Text>
-            
             <TextInput
                 style={styles.input}
                 placeholder="Username or Email"
@@ -40,7 +35,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onRegisterNavigat
                 onChangeText={setUsername}
                 placeholderTextColor="#666"
             />
-            
             <View style={styles.passwordContainer}>
                 <TextInput
                     style={styles.inputPassword}
@@ -57,11 +51,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onRegisterNavigat
                     <Text style={styles.toggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
                 </TouchableOpacity>
             </View>
-
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                 <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
-
             <TouchableOpacity style={styles.registerLink} onPress={onRegisterNavigate}>
                 <Text style={styles.registerText}>
                     Do not have an account? <Text style={styles.registerTextBold}>Register here!</Text>

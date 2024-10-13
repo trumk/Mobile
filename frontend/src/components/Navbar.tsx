@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Alert,
-} from "react-native";
-import axios from "axios";
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
+import { fetchUser, logoutUser } from '../screen/apiRequest'; 
 
 interface NavbarProps {
   username: string;
@@ -19,18 +12,16 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const loadUser = async () => {
       try {
-        const response = await axios.get(
-          "http://192.168.1.14:5000/api/auth/user"
-        );
-        setUsername(response.data.user.username);
+        const user = await fetchUser(); 
+        setUsername(user.username);
       } catch (error) {
         console.error("Error fetching user", error);
       }
     };
 
-    fetchUser();
+    loadUser();
   }, []);
 
   const handleUsernamePress = () => {
@@ -39,7 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://192.168.1.14:5000/api/auth/logout");
+      await logoutUser(); 
       Alert.alert("Success", "You have been logged out.");
       onLinkPress("Login");
     } catch (error) {
@@ -54,10 +45,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
   return (
     <View style={styles.navbar}>
       <View style={styles.logoContainer}>
-        <Image
-          source={require("../../assets/meow.jpg")} 
-          style={styles.logo}
-        />
+        <Image source={require("../../assets/meow.jpg")} style={styles.logo} />
       </View>
 
       <View style={styles.linksContainer}>

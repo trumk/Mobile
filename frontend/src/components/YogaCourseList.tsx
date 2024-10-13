@@ -22,6 +22,11 @@ type YogaCourseListProps = {
     navigation: StackNavigationProp<RootStackParamList>;
 };
 
+const formatDateTime = (isoString: string) => {
+    const date = new Date(isoString);
+    return date.toLocaleString();
+};
+
 const YogaCourseList: React.FC<YogaCourseListProps> = ({ courses, navigation }) => {
     return (
         <View style={styles.container}>
@@ -32,7 +37,7 @@ const YogaCourseList: React.FC<YogaCourseListProps> = ({ courses, navigation }) 
                     <View style={styles.courseCard}>
                         <Text style={styles.courseType}>{item.classType} - {item.teacherName}</Text>
                         <Text>Day: {item.dayOfWeek}</Text>
-                        <Text>Time: {item.courseTime}</Text>
+                        <Text>Time: {item.courseTime ? formatDateTime(item.courseTime) : 'N/A'}</Text>
                         <Text>Location: {item.location}</Text>
                         <Text>Duration: {item.duration} minutes</Text>
                         <TouchableOpacity 

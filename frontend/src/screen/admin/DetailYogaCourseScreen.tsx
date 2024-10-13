@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
-import axios from 'axios';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { fetchCourseDetails, deleteYogaCourse } from '../apiRequest'; 
 
 type RootStackParamList = {
     'Detail YogaCourse': { courseId: string };
@@ -23,8 +23,8 @@ const DetailYogaCourseScreen: React.FC<DetailYogaCourseScreenProps> = ({ route, 
     useEffect(() => {
         const fetchCourseDetail = async () => {
             try {
-                const response = await axios.get(`http://192.168.1.14:5000/api/admin/courses/${courseId}`);
-                setCourse(response.data);
+                const data = await fetchCourseDetails(courseId); 
+                setCourse(data);
             } catch (err) {
                 setError('Could not fetch course details.');
             } finally {
@@ -41,7 +41,7 @@ const DetailYogaCourseScreen: React.FC<DetailYogaCourseScreenProps> = ({ route, 
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://192.168.1.14:5000/api/admin/courses/${courseId}`);
+            await deleteYogaCourse(courseId); 
             Alert.alert('Success', 'Yoga course deleted successfully', [
                 { text: 'OK', onPress: () => navigation.goBack() },
             ]);

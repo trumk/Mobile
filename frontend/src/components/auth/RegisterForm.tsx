@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import { register } from '../../screen/apiRequest'; 
 
 interface RegisterFormProps {
     onRegisterSuccess: () => void;
@@ -21,11 +21,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
         }
 
         try {
-            await axios.post('http://192.168.1.14:5000/api/auth/register', {
-                username,
-                email,
-                password,
-            });
+            await register(username, email, password); 
             Alert.alert('Success', 'User registered successfully');
             onRegisterSuccess();
         } catch (error) {
@@ -36,7 +32,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Register</Text>
-
             <TextInput
                 style={styles.input}
                 placeholder="Username"
@@ -44,7 +39,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
                 onChangeText={setUsername}
                 placeholderTextColor="#666"
             />
-
             <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -53,7 +47,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
                 keyboardType="email-address"
                 placeholderTextColor="#666"
             />
-
             <View style={styles.passwordContainer}>
                 <TextInput
                     style={styles.inputPassword}
@@ -70,8 +63,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
                     <Text style={styles.toggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
                 </TouchableOpacity>
             </View>
-
-        <View style={[styles.passwordContainer, styles.marginTop]}>
+            <View style={[styles.passwordContainer, styles.marginTop]}>
                 <TextInput
                     style={styles.inputPassword}
                     placeholder="Confirm Password"
@@ -87,7 +79,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
                     <Text style={styles.toggleText}>{showConfirmPassword ? 'Hide' : 'Show'}</Text>
                 </TouchableOpacity>
             </View>
-
             <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
                 <Text style={styles.registerButtonText}>Register</Text>
             </TouchableOpacity>
