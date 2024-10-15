@@ -115,3 +115,37 @@ export const logoutUser = async () => {
     throw new Error(error.response ? error.response.data.message : 'Failed to log out');
   }
 };
+
+
+export const joinYogaCourse = async (courseId: string) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/courses/${courseId}/join`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response ? error.response.data.message : 'Failed to join the course');
+  }
+};
+
+
+export const searchYogaCourses = async (searchQuery: string) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/courses/search`, {
+      params: { search: searchQuery },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response ? error.response.data.message : 'Failed to search courses');
+  }
+};
+
+
+export const filterYogaCourses = async (courseTime: string, classType: string) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/courses/filter`, {
+      params: { courseTime, classType },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response ? error.response.data.message : 'Failed to filter courses');
+  }
+};

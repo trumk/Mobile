@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { fetchUserDetails } from '../screen/apiRequest'; 
+import { RootStackParamList } from '../../App'; 
 
 type YogaCourse = {
     _id: string;
@@ -12,14 +14,9 @@ type YogaCourse = {
     duration: number;
 };
 
-type RootStackParamList = {
-    'Detail YogaCourse': { courseId: string };
-    'Edit YogaCourse': { courseId: string; onEditSuccess: () => void };
-};
-
 type YogaCourseListProps = {
-    courses: YogaCourse[]; 
-    navigation: StackNavigationProp<RootStackParamList>;
+    courses: YogaCourse[];
+    navigation: StackNavigationProp<RootStackParamList, 'Detail YogaCourse' | 'Detail Course'>;
 };
 
 const formatDateTime = (isoString: string) => {
@@ -28,6 +25,21 @@ const formatDateTime = (isoString: string) => {
 };
 
 const YogaCourseList: React.FC<YogaCourseListProps> = ({ courses, navigation }) => {
+    const [role, setRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        const getUserDetails = async () => {
+            try {
+                const user = await fetchUserDetails(); 
+                setRole(user.role); 
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+            }
+        };
+
+        getUserDetails();
+    }, []);
+
     return (
         <View style={styles.container}>
             <FlatList
@@ -35,14 +47,24 @@ const YogaCourseList: React.FC<YogaCourseListProps> = ({ courses, navigation }) 
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
                     <View style={styles.courseCard}>
-                        <Text style={styles.courseType}>{item.classType} - {item.teacherName}</Text>
+                        <Text style={styles.courseType}>
+                            {item.classType} - {item.teacherName}
+                        </Text>
                         <Text>Day: {item.dayOfWeek}</Text>
-                        <Text>Time: {item.courseTime ? formatDateTime(item.courseTime) : 'N/A'}</Text>
+                        <Text>
+                            Time: {item.courseTime ? formatDateTime(item.courseTime) : 'N/A'}
+                        </Text>
                         <Text>Location: {item.location}</Text>
                         <Text>Duration: {item.duration} minutes</Text>
-                        <TouchableOpacity 
-                            style={styles.detailButton} 
-                            onPress={() => navigation.navigate('Detail YogaCourse', { courseId: item._id })} 
+                        <TouchableOpacity
+                            style={styles.detailButton}
+                            onPress={() => {
+                                if (role === 'admin') {
+                                    navigation.navigate('Detail YogaCourse', { courseId: item._id });
+                                } else if (role === 'customer') {
+                                    navigation.navigate('Detail Course', { courseId: item._id });
+                                }
+                            }}
                         >
                             <Text style={styles.detailButtonText}>View Details</Text>
                         </TouchableOpacity>
@@ -79,7 +101,7 @@ const styles = StyleSheet.create({
         color: '#2C3E50',
     },
     detailButton: {
-        backgroundColor: '#2a7183', 
+        backgroundColor: '#2a7183',
         paddingVertical: 10,
         borderRadius: 5,
         alignItems: 'center',

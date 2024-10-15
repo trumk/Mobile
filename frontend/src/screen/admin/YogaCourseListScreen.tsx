@@ -4,15 +4,11 @@ import YogaCourseList from '../../components/YogaCourseList';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { YogaCourse } from '../../../types';
-import { fetchCourses } from '../apiRequest'; 
-
-type RootStackParamList = {
-    'Edit YogaCourse': { courseId: string; onEditSuccess: () => void }; 
-    'Detail YogaCourse': { courseId: string };
-};
+import { fetchCourses } from '../apiRequest';
+import { RootStackParamList } from '../../../App';  
 
 type YogaCourseListScreenProps = {
-    navigation: StackNavigationProp<RootStackParamList>;
+    navigation: StackNavigationProp<RootStackParamList, 'Detail YogaCourse'>;
 };
 
 const YogaCourseListScreen: React.FC<YogaCourseListScreenProps> = ({ navigation }) => {
