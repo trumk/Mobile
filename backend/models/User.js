@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
         enum: ['admin', 'customer'], 
         default: 'customer' 
     },
+    courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'YogaCourse' }]
 });
 
 module.exports = mongoose.model('User', userSchema);

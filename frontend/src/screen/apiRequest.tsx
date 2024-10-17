@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.1.16:5000/api'; 
+const BASE_URL = 'http://192.168.1.2:5000/api'; 
 
 export const login = async (username: string, password: string) => {
   try {
@@ -119,9 +119,12 @@ export const logoutUser = async () => {
 
 export const joinYogaCourse = async (courseId: string) => {
   try {
-    const response = await axios.post(`${BASE_URL}/courses/${courseId}/join`);
+    console.log(`Sending POST request to: ${BASE_URL}/admin/courses/${courseId}/join`);
+    const response = await axios.post(`${BASE_URL}/admin/courses/${courseId}/join`);
+    console.log('Response:', response.data);
     return response.data;
   } catch (error: any) {
+    console.error('Error:', error);
     throw new Error(error.response ? error.response.data.message : 'Failed to join the course');
   }
 };

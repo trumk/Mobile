@@ -19,7 +19,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
             Alert.alert('Error', 'Passwords do not match');
             return;
         }
-
         try {
             await register(username, email, password); 
             Alert.alert('Success', 'User registered successfully');

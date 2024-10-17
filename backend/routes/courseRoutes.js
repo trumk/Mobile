@@ -21,7 +21,7 @@ const checkAdmin = (req, res, next) => {
 // Public routes
 router.get('/courses', getAllCourses);          
 router.get('/courses/:id', detailCourse);       
-router.post('/courses/:id/join', joinCourse);   
+router.post('/courses/:id/join', joinCourse);
 router.get('/courses/search', searchCourses);   
 router.get('/courses/filter', filterCourses);    
 

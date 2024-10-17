@@ -15,15 +15,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onRegisterNavigat
     const handleLogin = async () => {
         try {
             const response = await login(username, password); 
-            if (response.role === 'admin') {
-                onLoginSuccess('admin');
-            } else {
-                onLoginSuccess('customer');
-            }
+            onLoginSuccess('customer'); 
         } catch (error) {
             Alert.alert('Login Error', 'Invalid username or password');
         }
     };
+    
 
     return (
         <View style={styles.container}>

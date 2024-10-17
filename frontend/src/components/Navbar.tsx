@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
 import { fetchUser, logoutUser } from '../screen/apiRequest'; 
+import { StackNavigationProp } from "@react-navigation/stack";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from '../../App'; 
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 interface NavbarProps {
   username: string;
@@ -8,6 +13,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
+  const navigation = useNavigation<NavigationProp>();
   const [username, setUsername] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
@@ -38,10 +44,6 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
     }
   };
 
-  const handleProfile = () => {
-    onLinkPress("Profile");
-  };
-
   return (
     <View style={styles.navbar}>
       <View style={styles.logoContainer}>
@@ -52,7 +54,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
         <TouchableOpacity onPress={() => onLinkPress("Home")}>
           <Text style={styles.link}>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => onLinkPress("YogaCourses")}>
+        <TouchableOpacity onPress={() => navigation.navigate('Courses')}>
           <Text style={styles.link}>Courses</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => onLinkPress("Search")}>
@@ -66,7 +68,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
         </TouchableOpacity>
         {showDropdown && (
           <View style={styles.dropdownMenu}>
-            <TouchableOpacity onPress={handleProfile}>
+            <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
               <Text style={styles.dropdownItem}>Profile</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleLogout}>

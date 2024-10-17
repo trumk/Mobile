@@ -59,9 +59,11 @@ exports.getUser = async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ message: 'User not logged in' });
     }
-
     try {
-        const user = await User.findById(req.session.userId).select('-password'); 
+        const user = await User.findById(req.session.userId)
+            .select('-password') 
+            .populate('courses', 'classType teacherName'); 
+
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -70,6 +72,7 @@ exports.getUser = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving user information', error });
     }
 };
+
 
 exports.getAllUsers = async (req, res) => {
     try {

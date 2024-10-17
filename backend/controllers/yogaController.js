@@ -1,4 +1,5 @@
 const YogaCourse = require('../models/YogaCourse');
+const User = require('../models/User');
 
 exports.getAllCourses = async (req, res) => {
     try {
@@ -69,23 +70,45 @@ exports.deleteCourse = async (req, res) => {
 
 exports.joinCourse = async (req, res) => {
     try {
+        console.log('Received request to join course:', req.params.id);
+        
         const course = await YogaCourse.findById(req.params.id);
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
         }
-        
+
         if (course.capacity <= 0) {
             return res.status(400).json({ message: 'Course is full' });
         }
 
-        course.capacity -= 1; 
+        // Sử dụng thông tin từ session
+        console.log('Fetching user from session:', req.session.userId);
+        if (!req.session.userId) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (user.courses.includes(course._id)) {
+            return res.status(400).json({ message: 'You have already joined this course' });
+        }
+
+        course.capacity -= 1;
         await course.save();
+
+        user.courses.push(course._id);
+        await user.save();
 
         res.json({ message: 'Successfully joined the course', course });
     } catch (error) {
+        console.error('Error in joinCourse:', error);
         res.status(500).json({ message: error.message });
     }
 };
+
 
 exports.searchCourses = async (req, res) => {
     const { search } = req.query;

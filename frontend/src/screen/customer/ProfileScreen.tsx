@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { fetchUserDetails } from '../apiRequest'; 
+
 const ProfileScreen: React.FC = () => {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -44,6 +45,17 @@ const ProfileScreen: React.FC = () => {
                 <Text style={styles.detailItem}>Username: {user?.username}</Text>
                 <Text style={styles.detailItem}>Email: {user?.email}</Text>
                 <Text style={styles.detailItem}>Role: {user?.role}</Text>
+
+                <Text style={styles.sectionTitle}>Courses</Text>
+                {user?.courses && user.courses.length > 0 ? (
+                    user.courses.map((course: any) => (
+                        <View key={course._id} style={styles.courseItem}>
+                            <Text style={styles.courseName}>- {course.classType}</Text><Text>by {course.teacherName}</Text>   
+                        </View>
+                    ))
+                ) : (
+                    <Text style={styles.detailItem}>No courses enrolled</Text>
+                )}
             </View>
         </View>
     );
@@ -94,6 +106,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 10,
         color: '#666',
+    },
+    courseItem: {
+        marginBottom: 10,
+    },
+    courseName: {
+        fontSize: 16,
+        color: '#333',
     },
 });
 
