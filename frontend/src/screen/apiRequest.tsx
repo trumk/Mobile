@@ -119,9 +119,7 @@ export const logoutUser = async () => {
 
 export const joinYogaCourse = async (courseId: string) => {
   try {
-    console.log(`Sending POST request to: ${BASE_URL}/admin/courses/${courseId}/join`);
     const response = await axios.post(`${BASE_URL}/admin/courses/${courseId}/join`);
-    console.log('Response:', response.data);
     return response.data;
   } catch (error: any) {
     console.error('Error:', error);

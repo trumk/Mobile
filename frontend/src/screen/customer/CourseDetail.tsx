@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Alert,
-  Image,
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -25,6 +24,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isJoined, setIsJoined] = useState<boolean>(false); 
+  const [refresh, setRefresh] = useState(false); 
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -39,8 +39,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       }
     };
     fetchCourseDetail();
-  }, [courseId]);
-  
+  }, [courseId, refresh]); 
+
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
     return date.toLocaleString();
@@ -51,11 +51,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       const response = await joinYogaCourse(courseId); 
       Alert.alert('Success', response.message); 
       setIsJoined(true); 
+      setRefresh(!refresh); 
     } catch (error: any) {
       Alert.alert('Error', error.message); 
     }
-};
-
+  };
 
   if (loading) {
     return (
@@ -73,7 +73,6 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
     );
   }
 
-  // Kiểm tra nếu course là null
   if (!course) {
     return (
       <View style={styles.center}>
@@ -94,7 +93,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
         Time: {course.courseTime ? formatDateTime(course.courseTime) : "N/A"}
       </Text>
       <Text style={styles.details}>
-        Capacity: {course.capacity || "N/A"} persons
+        Capacity: {course.capacity || "N/A"} person(s)
       </Text>
       <Text style={styles.details}>
         Duration: {course.duration || "N/A"} minutes
@@ -110,12 +109,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
 
       {isJoined ? (
         <View style={styles.qrContainer}>
-        <Text style={styles.qrText}>You have joined this course!</Text>
-        <QRCode 
-          value={`Course ID: ${course._id}, Class: ${course.classType}, Teacher: ${course.teacherName}, Location: ${course.location}, Time: ${formatDateTime(course.courseTime)}`}
-          size={150}
-        />
-      </View>
+          <Text style={styles.qrText}>You have joined this course!</Text>
+          <QRCode 
+            value={`Course ID: ${course._id}, Class: ${course.classType}, Teacher: ${course.teacherName}, Location: ${course.location}, Time: ${formatDateTime(course.courseTime)}`}
+            size={150}
+          />
+        </View>
       ) : (
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleJoinCourse}>
