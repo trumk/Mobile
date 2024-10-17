@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: "#1e90ff",
     elevation: 4,
+    zIndex: 10,  
   },
   logoContainer: {
     flex: 1,
@@ -114,6 +115,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "flex-end",
     position: "relative",
+    zIndex: 10, 
   },
   username: {
     color: "#fff",
@@ -126,9 +128,14 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#fff",
     borderRadius: 8,
-    elevation: 4,
     padding: 10,
     width: 150,
+    zIndex: 999,  
+    elevation: 5,  
+    shadowColor: "#000",  
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   dropdownItem: {
     paddingVertical: 8,

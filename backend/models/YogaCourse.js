@@ -9,7 +9,8 @@ const YogaCourseSchema = new mongoose.Schema({
     classType: { type: String, required: true },
     description: { type: String }, 
     teacherName: { type: String, required: true }, 
-    location: { type: String, required: true } 
+    location: { type: String, required: true },
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] 
 });
 
 module.exports = mongoose.model('YogaCourse', YogaCourseSchema);

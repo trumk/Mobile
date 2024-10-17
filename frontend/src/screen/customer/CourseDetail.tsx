@@ -6,11 +6,13 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Alert,
+  Image,
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../App";
 import { fetchCourseDetails, joinYogaCourse } from "../apiRequest";
+import QRCode from "react-native-qrcode-svg";  
 
 type CourseDetailProps = {
   route: RouteProp<RootStackParamList, "Detail Course">;
@@ -22,12 +24,14 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isJoined, setIsJoined] = useState<boolean>(false); 
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
       try {
         const data = await fetchCourseDetails(courseId);
         setCourse(data);
+        setIsJoined(data.isJoined || false);
       } catch (err) {
         setError("Could not fetch course details.");
       } finally {
@@ -36,7 +40,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
     };
     fetchCourseDetail();
   }, [courseId]);
-
+  
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
     return date.toLocaleString();
@@ -46,10 +50,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
     try {
       const response = await joinYogaCourse(courseId); 
       Alert.alert('Success', response.message); 
+      setIsJoined(true); 
     } catch (error: any) {
       Alert.alert('Error', error.message); 
     }
-  };
+};
+
 
   if (loading) {
     return (
@@ -101,11 +107,22 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       <Text style={styles.details}>
         Description: {course.description || "No Description Available"}
       </Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleJoinCourse}>
-          <Text style={styles.buttonText}>Join</Text>
-        </TouchableOpacity>
+
+      {isJoined ? (
+        <View style={styles.qrContainer}>
+        <Text style={styles.qrText}>You have joined this course!</Text>
+        <QRCode 
+          value={`Course ID: ${course._id}, Class: ${course.classType}, Teacher: ${course.teacherName}, Location: ${course.location}, Time: ${formatDateTime(course.courseTime)}`}
+          size={150}
+        />
       </View>
+      ) : (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleJoinCourse}>
+            <Text style={styles.buttonText}>Join</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -114,7 +131,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f8f9fa",
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -159,6 +176,17 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontWeight: "600",
     fontSize: 16,
+    textAlign: "center",
+  },
+  qrContainer: {
+    marginTop: 30,
+    alignItems: "center",
+  },
+  qrText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#1E5B75",
+    marginBottom: 20,
     textAlign: "center",
   },
 });

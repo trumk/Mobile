@@ -12,15 +12,33 @@ exports.getAllCourses = async (req, res) => {
 
 exports.detailCourse = async (req, res) => {
     try {
-        const course = await YogaCourse.findById(req.params.id);
+        const course = await YogaCourse.findById(req.params.id)
+            .populate('participants', 'username email'); 
+
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
         }
-        res.json(course);
+
+        if (!req.session.userId) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isJoined = user.courses.includes(course._id); 
+
+        res.json({
+            ...course.toObject(),
+            isJoined 
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 exports.createCourse = async (req, res) => {
     const { dayOfWeek, courseTime, capacity, duration, pricePerClass, classType, description, teacherName, location } = req.body;
@@ -70,8 +88,6 @@ exports.deleteCourse = async (req, res) => {
 
 exports.joinCourse = async (req, res) => {
     try {
-        console.log('Received request to join course:', req.params.id);
-        
         const course = await YogaCourse.findById(req.params.id);
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
@@ -81,8 +97,6 @@ exports.joinCourse = async (req, res) => {
             return res.status(400).json({ message: 'Course is full' });
         }
 
-        // Sử dụng thông tin từ session
-        console.log('Fetching user from session:', req.session.userId);
         if (!req.session.userId) {
             return res.status(401).json({ message: 'User not authenticated' });
         }
@@ -96,6 +110,7 @@ exports.joinCourse = async (req, res) => {
             return res.status(400).json({ message: 'You have already joined this course' });
         }
 
+        course.participants.push(user._id);
         course.capacity -= 1;
         await course.save();
 
@@ -104,7 +119,6 @@ exports.joinCourse = async (req, res) => {
 
         res.json({ message: 'Successfully joined the course', course });
     } catch (error) {
-        console.error('Error in joinCourse:', error);
         res.status(500).json({ message: error.message });
     }
 };
