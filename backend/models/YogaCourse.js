@@ -6,11 +6,11 @@ const YogaCourseSchema = new mongoose.Schema({
     capacity: { type: Number, required: true },
     duration: { type: Number, required: true }, 
     pricePerClass: { type: Number, required: true }, 
-    classType: { type: String, required: true },
+    classType: { type: mongoose.Schema.Types.ObjectId, ref: 'ClassType', required: true },
     description: { type: String }, 
     teacherName: { type: String, required: true }, 
     location: { type: String, required: true },
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] 
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 module.exports = mongoose.model('YogaCourse', YogaCourseSchema);

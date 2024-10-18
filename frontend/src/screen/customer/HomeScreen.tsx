@@ -38,11 +38,13 @@ const HomeScreen: React.FC = () => {
                     <Text style={styles.buttonText}>Explore Courses</Text>
                 </TouchableOpacity>
 
-                {/* Phần các loại yoga */}
+                <TouchableOpacity style={styles.simpleButton} onPress={() => navigation.navigate('Course Management')}>
+                    <Text style={styles.simpleButtonText}>Manage Courses</Text>
+                </TouchableOpacity>
+
                 <View style={styles.coursesSection}>
                     <Text style={styles.sectionTitle}>Our Yoga Courses</Text>
                     
-                    {/* Family Yoga */}
                     <Text style={styles.courseTitle}>Family Yoga</Text>
                     <View style={styles.courseWrapper}>
                         <Image source={{ uri: "https://aeliawellness.com.cy/wp-content/uploads/2019/11/1200-478618627-family-meditating-together-1024x683.jpg" }} style={styles.courseImage} />
@@ -51,7 +53,6 @@ const HomeScreen: React.FC = () => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Aerial Yoga */}
                     <Text style={styles.courseTitle}>Aerial Yoga</Text>
                     <View style={styles.courseWrapper}>
                         <Image source={{ uri: "https://cdn.nhathuoclongchau.com.vn/unsafe/800x0/https://cms-prod.s3-sgn09.fptcloud.com/aerial_yoga_la_gi_nhung_loi_ich_cua_bo_mon_nay_doi_voi_suc_khoe_cbddcd4aa1.jpg" }} style={styles.courseImage} />
@@ -60,10 +61,9 @@ const HomeScreen: React.FC = () => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Power Yoga */}
-                    <Text style={styles.courseTitle}>Power Yoga</Text>
+                    <Text style={styles.courseTitle}>Flow Yoga</Text>
                     <View style={styles.courseWrapper}>
-                        <Image source={{ uri: "https://fitcenter.vn/wp-content/uploads/2023/07/Power-yoga-la-gi.jpg" }} style={styles.courseImage} />
+                        <Image source={{ uri: "https://toshiko.vn/storage/images/2021/08/yoga-flow-la-gi-1.jpg" }} style={styles.courseImage} />
                         <TouchableOpacity style={styles.courseButton} onPress={() => navigation.navigate('Courses')}>
                             <Text style={styles.courseButtonText}>Learn More</Text>
                         </TouchableOpacity>
@@ -115,6 +115,19 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    simpleButton: {
+        marginTop: 10,
+        backgroundColor: '#6c757d',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+    },
+    simpleButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
     coursesSection: {
         marginTop: 30,

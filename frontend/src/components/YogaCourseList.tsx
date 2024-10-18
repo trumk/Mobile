@@ -5,22 +5,11 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  Image,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { fetchUserDetails } from "../screen/apiRequest";
 import { RootStackParamList } from "../../App";
-
-type YogaCourse = {
-  _id: string;
-  classType: string;
-  teacherName: string;
-  dayOfWeek: string;
-  courseTime: string;
-  location: string;
-  duration: number;
-  capacity: number;
-};
+import { YogaCourse } from "../../types"; 
 
 type YogaCourseListProps = {
   courses: YogaCourse[];
@@ -58,60 +47,65 @@ const YogaCourseList: React.FC<YogaCourseListProps> = ({
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={courses}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => {
-          const hasJoined = userCourses.includes(item._id); 
+  <FlatList
+  data={courses}
+  keyExtractor={(item) => item._id}
+  renderItem={({ item }) => {
+    const hasJoined = userCourses.includes(item._id);
 
-          return (
-            <View
-              style={[
-                styles.courseCard,
-                item.capacity === 0 && !hasJoined && styles.courseFull, 
-              ]}
-            >
-              <View style={styles.courseHeader}>
-                <Text style={styles.courseType}>{item.classType}</Text>
-                <Text style={styles.teacherName}>by {item.teacherName}</Text>
-              </View>
-              <View style={styles.courseDetails}>
-                <Text style={styles.courseDetailText}>
-                  Day: {item.dayOfWeek}
-                </Text>
-                <Text style={styles.courseDetailText}>
-                  Time: {item.courseTime ? formatTime(item.courseTime) : "N/A"}
-                </Text>
-                <Text style={styles.courseDetailText}>
-                  Location: {item.location}
-                </Text>
-                <Text style={styles.courseDetailText}>
-                  Duration: {item.duration} minutes
-                </Text>
-                <Text style={styles.courseDetailText}>
-                  Capacity: {item.capacity === 0 ? "Fully booked" : item.capacity}
-                </Text>
-              </View>
+    return (
+      <View
+        style={[
+          styles.courseCard,
+          item.capacity === 0 && !hasJoined && styles.courseFull,
+        ]}
+      >
+        <View style={styles.courseHeader}>
+          <Text style={styles.courseType}>
+            {item.classType?.typeName || 'Unknown Class Type'}
+          </Text>
+          <Text style={styles.teacherName}>
+            by {item.teacherName || 'Unknown Teacher'} 
+          </Text>
+        </View>
+        <View style={styles.courseDetails}>
+          <Text style={styles.courseDetailText}>
+            Day: {item.dayOfWeek || 'N/A'} 
+          </Text>
+          <Text style={styles.courseDetailText}>
+            Time: {item.courseTime ? formatTime(item.courseTime) : 'N/A'}
+          </Text>
+          <Text style={styles.courseDetailText}>
+            Location: {item.location || 'Unknown Location'} 
+          </Text>
+          <Text style={styles.courseDetailText}>
+            Duration: {item.duration ? `${item.duration} minutes` : 'N/A'} 
+          </Text>
+          <Text style={styles.courseDetailText}>
+            Capacity: {item.capacity === 0 ? 'Fully booked' : item.capacity}
+          </Text>
+        </View>
 
-              {hasJoined || item.capacity > 0 ? (
-                <TouchableOpacity
-                  style={styles.detailButton}
-                  onPress={() => {
-                    navigation.navigate("Detail Course", { courseId: item._id });
-                  }}
-                >
-                  <Text style={styles.detailButtonText}>View Details</Text>
-                </TouchableOpacity>
-              ) : (
-                <View style={styles.fullNotice}>
-                  <Text style={styles.fullNoticeText}>Full</Text>
-                </View>
-              )}
-            </View>
-          );
-        }}
-      />
-    </View>
+        {hasJoined || item.capacity > 0 ? (
+          <TouchableOpacity
+          style={styles.detailButton}
+          onPress={() => {
+            navigation.navigate("Detail Course", { courseId: item._id });
+          }}
+        >
+          <Text style={styles.detailButtonText}>View Details</Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.fullNotice}>
+          <Text style={styles.fullNoticeText}>Full</Text>
+        </View>
+      )}
+      </View>
+    );
+  }}
+/>
+
+</View>
   );
 };
 

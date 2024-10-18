@@ -116,6 +116,50 @@ export const logoutUser = async () => {
   }
 };
 
+export const fetchClassTypes = async () => {
+  try {
+      const response = await axios.get(`${BASE_URL}/class`);
+      return response.data;
+  } catch (error: any) {  
+      throw new Error(error.response ? error.response.data.message : 'Failed to fetch class types');
+  }
+};
+
+export const fetchClassTypeDetails = async (classTypeId: string) => {
+  try {
+      const response = await axios.get(`${BASE_URL}/class/${classTypeId}`);
+      return response.data;
+  } catch (error: any) {  
+      throw new Error(error.response ? error.response.data.message : 'Failed to fetch class type details');
+  }
+};
+
+export const addClassType = async (classType: any) => {
+  try {
+      const response = await axios.post(`${BASE_URL}/class`, classType);
+      return response.data;
+  } catch (error: any) {  
+      throw new Error(error.response ? error.response.data.message : 'Failed to add class type');
+  }
+};
+
+export const updateClassType = async (classTypeId: string, updatedClassType: any) => {
+  try {
+      const response = await axios.put(`${BASE_URL}/class/${classTypeId}`, updatedClassType);
+      return response.data;
+  } catch (error: any) {  
+      throw new Error(error.response ? error.response.data.message : 'Failed to update class type');
+  }
+};
+
+export const deleteClassType = async (classTypeId: string) => {
+  try {
+      await axios.delete(`${BASE_URL}/class/${classTypeId}`);
+  } catch (error: any) {  
+      throw new Error(error.response ? error.response.data.message : 'Failed to delete class type');
+  }
+};
+
 
 export const joinYogaCourse = async (courseId: string) => {
   try {
@@ -128,22 +172,24 @@ export const joinYogaCourse = async (courseId: string) => {
 };
 
 
-export const searchYogaCourses = async (searchQuery: string) => {
+export const fetchCoursesBySearch = async (teacherName: string, dayOfWeek?: string | null) => {
   try {
-    const response = await axios.get(`${BASE_URL}/courses/search`, {
-      params: { search: searchQuery },
-    });
-    return response.data;
+      const params: any = {};
+      if (teacherName) params.teacherName = teacherName;
+      if (dayOfWeek) params.dayOfWeek = dayOfWeek;
+
+      const response = await axios.get(`${BASE_URL}/admin/courses/search`, { params });
+      return response.data;
   } catch (error: any) {
-    throw new Error(error.response ? error.response.data.message : 'Failed to search courses');
+      throw new Error(error.response ? error.response.data.message : 'Failed to search courses');
   }
 };
 
 
-export const filterYogaCourses = async (courseTime: string, classType: string) => {
+export const filterYogaCourses = async (duration: string, classType: string) => {
   try {
-    const response = await axios.get(`${BASE_URL}/courses/filter`, {
-      params: { courseTime, classType },
+    const response = await axios.get(`${BASE_URL}/admin/courses/filter`, {
+      params: { duration, classType },
     });
     return response.data;
   } catch (error: any) {

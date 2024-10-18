@@ -51,13 +51,13 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
       </View>
 
       <View style={styles.linksContainer}>
-        <TouchableOpacity onPress={() => onLinkPress("Home")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
           <Text style={styles.link}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Courses')}>
           <Text style={styles.link}>Courses</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => onLinkPress("Search")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Search")}>
           <Text style={styles.link}>Search</Text>
         </TouchableOpacity>
       </View>

@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, ActivityIndicator, ScrollView, ImageBackground } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  ScrollView,
+  ImageBackground,
+} from "react-native";
 import { fetchUserDetails } from "../apiRequest";
 
 const ProfileScreen: React.FC = () => {
@@ -32,7 +40,9 @@ const ProfileScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <ImageBackground
-        source={{ uri: "https://img.freepik.com/free-photo/digital-art-style-yoga-illustration_23-2151536888.jpg" }}
+        source={{
+          uri: "https://img.freepik.com/free-photo/digital-art-style-yoga-illustration_23-2151536888.jpg",
+        }}
         style={styles.headerBackground}
         resizeMode="cover"
       >
@@ -40,7 +50,9 @@ const ProfileScreen: React.FC = () => {
         <View style={styles.header}>
           <View style={styles.imageContainer}>
             <Image
-              source={{ uri: "https://i.pinimg.com/enabled_hi/564x/96/44/e2/9644e2545f2519bb0c1e83ff72fdafb7.jpg" }}
+              source={{
+                uri: "https://i.pinimg.com/enabled_hi/564x/96/44/e2/9644e2545f2519bb0c1e83ff72fdafb7.jpg",
+              }}
               style={styles.profileImage}
             />
           </View>
@@ -67,8 +79,13 @@ const ProfileScreen: React.FC = () => {
         {user?.courses && user.courses.length > 0 ? (
           user.courses.map((course: any) => (
             <View key={course._id} style={styles.courseCard}>
-              <Text style={styles.courseName}>{course.classType}</Text>
-              <Text style={styles.teacherName}>Instructor: {course.teacherName}</Text>
+              <Text style={styles.courseName}>
+                {course.classType?.typeName || "Unknown Class Type"}
+              </Text>
+
+              <Text style={styles.teacherName}>
+                Instructor: {course.teacherName}
+              </Text>
             </View>
           ))
         ) : (
@@ -167,11 +184,11 @@ const styles = StyleSheet.create({
   courseName: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#1e90ff",
+    color: "#1c2f28",
   },
   teacherName: {
     fontSize: 16,
-    color: "#ff6347",
+    color: "#cd6f5e",
     marginTop: 5,
   },
   noCourses: {

@@ -1,9 +1,10 @@
 const YogaCourse = require('../models/YogaCourse');
 const User = require('../models/User');
+const ClassType = require('../models/ClassType'); 
 
 exports.getAllCourses = async (req, res) => {
     try {
-        const courses = await YogaCourse.find();
+        const courses = await YogaCourse.find().populate('classType', 'typeName');
         res.json(courses);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -13,7 +14,8 @@ exports.getAllCourses = async (req, res) => {
 exports.detailCourse = async (req, res) => {
     try {
         const course = await YogaCourse.findById(req.params.id)
-            .populate('participants', 'username email'); 
+            .populate('participants', 'username email')
+            .populate('classType', 'typeName');
 
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
@@ -28,21 +30,25 @@ exports.detailCourse = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const isJoined = user.courses.includes(course._id); 
+        const isJoined = user.courses.includes(course._id);
 
         res.json({
             ...course.toObject(),
-            isJoined 
+            isJoined
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-
 exports.createCourse = async (req, res) => {
     const { dayOfWeek, courseTime, capacity, duration, pricePerClass, classType, description, teacherName, location } = req.body;
     try {
+        const classTypeDoc = await ClassType.findById(classType);
+        if (!classTypeDoc) {
+            return res.status(400).json({ message: 'Invalid class type' });
+        }
+
         const newCourse = new YogaCourse({
             dayOfWeek, 
             courseTime, 
@@ -63,7 +69,15 @@ exports.createCourse = async (req, res) => {
 
 exports.updateCourse = async (req, res) => {
     try {
-        const updatedCourse = await YogaCourse.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const { classType } = req.body;
+        if (classType) {
+            const classTypeDoc = await ClassType.findById(classType);
+            if (!classTypeDoc) {
+                return res.status(400).json({ message: 'Invalid class type' });
+            }
+        }
+
+        const updatedCourse = await YogaCourse.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('classType', 'typeName');
         if (!updatedCourse) {
             return res.status(404).json({ message: 'Course not found' });
         }
@@ -88,7 +102,9 @@ exports.deleteCourse = async (req, res) => {
 
 exports.joinCourse = async (req, res) => {
     try {
-        const course = await YogaCourse.findById(req.params.id);
+        const course = await YogaCourse.findById(req.params.id)
+            .populate('classType', 'typeName'); 
+
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
         }
@@ -109,7 +125,6 @@ exports.joinCourse = async (req, res) => {
         if (user.courses.includes(course._id)) {
             return res.status(400).json({ message: 'You have already joined this course' });
         }
-
         course.participants.push(user._id);
         course.capacity -= 1;
         await course.save();
@@ -123,36 +138,41 @@ exports.joinCourse = async (req, res) => {
     }
 };
 
-
 exports.searchCourses = async (req, res) => {
-    const { search } = req.query;
+    const { teacherName, dayOfWeek } = req.query;
+    let filters = {};
+
+    if (teacherName) {
+        filters.teacherName = { $regex: teacherName, $options: 'i' };
+    }
+
+    if (dayOfWeek) {
+        filters.dayOfWeek = dayOfWeek;
+    }
+
     try {
-        const courses = await YogaCourse.find({
-            $or: [
-                { classType: { $regex: search, $options: 'i' } },
-                { teacherName: { $regex: search, $options: 'i' } } 
-            ]
-        });
+        const courses = await YogaCourse.find(filters).populate('classType', 'typeName');
         res.json(courses);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
+
 exports.filterCourses = async (req, res) => {
-    const { courseTime, classType } = req.query;
+    const { duration, classType } = req.query;
     let filters = {};
 
-    if (courseTime) {
-        filters.courseTime = { $gte: new Date(courseTime) }; 
+    if (duration) {
+        filters.duration = parseInt(duration, 10); 
     }
 
     if (classType) {
-        filters.classType = classType; 
+        filters.classType = classType;
     }
 
     try {
-        const courses = await YogaCourse.find(filters);
+        const courses = await YogaCourse.find(filters).populate('classType', 'typeName');
         res.json(courses);
     } catch (error) {
         res.status(500).json({ message: error.message });

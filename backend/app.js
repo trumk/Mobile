@@ -5,6 +5,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const authRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes'); 
+const classRoutes = require('./routes/classRoutes'); 
 require('dotenv').config();
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(session({
 
 app.use('/api/auth', authRoutes); 
 app.use('/api/admin', courseRoutes); 
+app.use('/api/class', classRoutes); 
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))

@@ -1,12 +1,14 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from './src/screen/customer/HomeScreen';
 import LoginScreen from './src/screen/LoginScreen';
 import RegisterScreen from './src/screen/RegisterScreen';
+import HomeScreen from './src/screen/customer/HomeScreen';
 import ProfileScreen from './src/screen/customer/ProfileScreen';
 import CourseList from './src/screen/customer/CourseList';
 import CourseDetail from './src/screen/customer/CourseDetail';
+import CourseScreen from './src/screen/customer/CourseScreen';
+import SearchScreen from './src/screen/customer/SearchScreen';
 
 export type RootStackParamList = {
     Home: undefined;
@@ -16,6 +18,9 @@ export type RootStackParamList = {
     Register: undefined;
     Profile: undefined;
     Courses: undefined;
+    Search: undefined; 
+    "Course Management": undefined;
+
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -32,6 +37,10 @@ const App = () => {
                 <Stack.Screen name="Profile" component={ProfileScreen} /> 
                 <Stack.Screen name="Courses" component={CourseList} />
                 <Stack.Screen name="Detail Course" component={CourseDetail} />
+                <Stack.Screen name="Search" component={SearchScreen} /> 
+
+                <Stack.Screen name="Course Management" component={CourseScreen} />
+                
             </Stack.Navigator>
         </NavigationContainer>
     );

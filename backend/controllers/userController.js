@@ -62,7 +62,13 @@ exports.getUser = async (req, res) => {
     try {
         const user = await User.findById(req.session.userId)
             .select('-password') 
-            .populate('courses', 'classType teacherName'); 
+            .populate({
+                path: 'courses',
+                populate: {
+                    path: 'classType', 
+                    select: 'typeName' 
+                }
+            });
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });

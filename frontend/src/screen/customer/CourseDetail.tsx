@@ -11,7 +11,7 @@ import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../App";
 import { fetchCourseDetails, joinYogaCourse } from "../apiRequest";
-import QRCode from "react-native-qrcode-svg";  
+import QRCode from "react-native-qrcode-svg";
 
 type CourseDetailProps = {
   route: RouteProp<RootStackParamList, "Detail Course">;
@@ -23,8 +23,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isJoined, setIsJoined] = useState<boolean>(false); 
-  const [refresh, setRefresh] = useState(false); 
+  const [isJoined, setIsJoined] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -39,7 +39,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       }
     };
     fetchCourseDetail();
-  }, [courseId, refresh]); 
+  }, [courseId, refresh]);
 
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
@@ -48,12 +48,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
 
   const handleJoinCourse = async () => {
     try {
-      const response = await joinYogaCourse(courseId); 
-      Alert.alert('Success', response.message); 
-      setIsJoined(true); 
-      setRefresh(!refresh); 
+      const response = await joinYogaCourse(courseId);
+      Alert.alert("Success", response.message);
+      setIsJoined(true);
+      setRefresh(!refresh);
     } catch (error: any) {
-      Alert.alert('Error', error.message); 
+      Alert.alert("Error", error.message);
     }
   };
 
@@ -84,7 +84,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        {course.classType || "No Class Type Available"}
+        {course.classType?.typeName || "No Class Type Available"}{" "}
       </Text>
       <Text style={styles.details}>
         Day of the Week: {course.dayOfWeek || "N/A"}
@@ -93,7 +93,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
         Time: {course.courseTime ? formatDateTime(course.courseTime) : "N/A"}
       </Text>
       <Text style={styles.details}>
-        Capacity: {course.capacity || "N/A"} person(s)
+        Capacity: {course.capacity || "Full"} person(s)
       </Text>
       <Text style={styles.details}>
         Duration: {course.duration || "N/A"} minutes
@@ -110,8 +110,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       {isJoined ? (
         <View style={styles.qrContainer}>
           <Text style={styles.qrText}>You have joined this course!</Text>
-          <QRCode 
-            value={`Course ID: ${course._id}, Class: ${course.classType}, Teacher: ${course.teacherName}, Location: ${course.location}, Time: ${formatDateTime(course.courseTime)}`}
+          <QRCode
+            value={`Course ID: ${course._id}, Class: ${
+              course.classType?.typeName || "N/A"
+            }, Teacher: ${course.teacherName}, Location: ${
+              course.location
+            }, Time: ${formatDateTime(course.courseTime)}`}
             size={150}
           />
         </View>

@@ -1,3 +1,8 @@
+export type ClassType = {
+    _id: string;
+    typeName: string;
+};
+
 export type YogaCourse = {
     _id: string; 
     dayOfWeek: string; 
@@ -5,7 +10,7 @@ export type YogaCourse = {
     capacity: number; 
     duration: number; 
     pricePerClass: number; 
-    classType: string; 
+    classType: ClassType; 
     description?: string; 
     teacherName: string;
     location: string; 

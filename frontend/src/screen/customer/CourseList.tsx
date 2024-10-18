@@ -4,8 +4,9 @@ import YogaCourseList from '../../components/YogaCourseList';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { YogaCourse } from '../../../types';
-import { fetchCourses } from '../apiRequest';
+import { fetchCourses, filterYogaCourses } from '../apiRequest';
 import { RootStackParamList } from '../../../App'; 
+import Filter from '../../components/Filter'; 
 
 type CourseListProps = {
     navigation: StackNavigationProp<RootStackParamList, 'Detail Course'>; 
@@ -23,6 +24,15 @@ const CourseList: React.FC<CourseListProps> = ({ navigation }) => {
         }
     };
 
+    const handleFilter = async (duration: string, classType: string) => {
+        try {
+            const data = await filterYogaCourses(duration, classType);
+            setCourses(data);
+        } catch (error) {
+            console.error('Failed to filter courses:', error);
+        }
+    };
+
     useFocusEffect(
         useCallback(() => {
             loadCourses();
@@ -32,6 +42,7 @@ const CourseList: React.FC<CourseListProps> = ({ navigation }) => {
     return (
         <View style={styles.screenContainer}>
             <Text style={styles.screenTitle}>Yoga Course List</Text>
+            <Filter onFilter={handleFilter} />
             <YogaCourseList courses={courses} navigation={navigation} />
         </View>
     );
