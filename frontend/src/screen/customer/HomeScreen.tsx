@@ -23,7 +23,6 @@ const HomeScreen: React.FC = () => {
     return (
         <ScrollView style={styles.container}>
             <Navbar username="CustomerUsername" onLinkPress={handleLinkPress} />
-            {/* Ảnh lớn đầu trang */}
             <Image
                 source={{ uri: "https://cdn.pixabay.com/photo/2022/03/01/18/11/woman-7041806_960_720.jpg" }}  
                 style={styles.headerImage}
@@ -36,10 +35,6 @@ const HomeScreen: React.FC = () => {
                 </Text>
                 <TouchableOpacity style={styles.exploreButton} onPress={() => navigation.navigate('Courses')}>
                     <Text style={styles.buttonText}>Explore Courses</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.simpleButton} onPress={() => navigation.navigate('Course Management')}>
-                    <Text style={styles.simpleButtonText}>Manage Courses</Text>
                 </TouchableOpacity>
 
                 <View style={styles.coursesSection}>
@@ -115,19 +110,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
-    },
-    simpleButton: {
-        marginTop: 10,
-        backgroundColor: '#6c757d',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-    },
-    simpleButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center',
     },
     coursesSection: {
         marginTop: 30,

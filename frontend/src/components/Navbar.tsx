@@ -47,7 +47,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
   return (
     <View style={styles.navbar}>
       <View style={styles.logoContainer}>
-        <Image source={require("../../assets/meow.jpg")} style={styles.logo} />
+        <Image source={require("../../assets/logo.png")} style={styles.logo} />
       </View>
 
       <View style={styles.linksContainer}>
@@ -96,8 +96,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logo: {
-    width: 45,
-    height: 45,
+    width: 50,
+    height: 50,
     resizeMode: "contain",
   },
   linksContainer: {

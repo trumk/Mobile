@@ -50,9 +50,7 @@ const ProfileScreen: React.FC = () => {
         <View style={styles.header}>
           <View style={styles.imageContainer}>
             <Image
-              source={{
-                uri: "https://i.pinimg.com/enabled_hi/564x/96/44/e2/9644e2545f2519bb0c1e83ff72fdafb7.jpg",
-              }}
+              source={require("../../../assets/logo.png")}
               style={styles.profileImage}
             />
           </View>

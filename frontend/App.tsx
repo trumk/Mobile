@@ -7,7 +7,6 @@ import HomeScreen from './src/screen/customer/HomeScreen';
 import ProfileScreen from './src/screen/customer/ProfileScreen';
 import CourseList from './src/screen/customer/CourseList';
 import CourseDetail from './src/screen/customer/CourseDetail';
-import CourseScreen from './src/screen/customer/CourseScreen';
 import SearchScreen from './src/screen/customer/SearchScreen';
 
 export type RootStackParamList = {
@@ -19,7 +18,6 @@ export type RootStackParamList = {
     Profile: undefined;
     Courses: undefined;
     Search: undefined; 
-    "Course Management": undefined;
 
 };
 
@@ -38,9 +36,6 @@ const App = () => {
                 <Stack.Screen name="Courses" component={CourseList} />
                 <Stack.Screen name="Detail Course" component={CourseDetail} />
                 <Stack.Screen name="Search" component={SearchScreen} /> 
-
-                <Stack.Screen name="Course Management" component={CourseScreen} />
-                
             </Stack.Navigator>
         </NavigationContainer>
     );
