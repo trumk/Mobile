@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Alert,
+  ScrollView, 
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -82,9 +83,9 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>
-        {course.classType?.typeName || "No Class Type Available"}{" "}
+        {course.classType?.typeName || "No Class Type Available"}
       </Text>
       <Text style={styles.details}>
         Day of the Week: {course.dayOfWeek || "N/A"}
@@ -101,11 +102,26 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       <Text style={styles.details}>
         Price per Class: £{course.pricePerClass || "N/A"}
       </Text>
-      <Text style={styles.details}>Teacher: {course.teacherName || "N/A"}</Text>
-      <Text style={styles.details}>Location: {course.location || "N/A"}</Text>
+      <Text style={styles.details}>
+        Teacher: {course.teacherName || "N/A"}
+      </Text>
+      <Text style={styles.details}>
+        Location: {course.location || "N/A"}
+      </Text>
       <Text style={styles.details}>
         Description: {course.description || "No Description Available"}
       </Text>
+
+      <Text style={styles.participantsTitle}>Participants:</Text>
+      {course.participants && course.participants.length > 0 ? (
+        course.participants.map((participant: any) => (
+          <Text key={participant._id} style={styles.participantText}>
+            - {participant.username}
+          </Text>
+        ))
+      ) : (
+        <Text style={styles.noParticipants}>No participants yet</Text>
+      )}
 
       {isJoined ? (
         <View style={styles.qrContainer}>
@@ -126,7 +142,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -163,6 +179,22 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     color: "red",
+  },
+  participantsTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginVertical: 15,
+  },
+  participantText: {
+    fontSize: 16,
+    color: "#cd6c6c",
+    padding: 5,
+  },
+  noParticipants: {
+    fontSize: 16,
+    color: "#888",
+    padding: 5,
   },
   buttonContainer: {
     marginTop: 30,
