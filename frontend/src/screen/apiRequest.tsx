@@ -68,36 +68,6 @@ export const fetchCourseDetails = async (courseId: string) => {
   }
 };
 
-
-export const addYogaCourse = async (course: any) => {
-  try {
-    const response = await axios.post(`${BASE_URL}/admin/courses`, course);
-    return response.data;
-  } catch (error: any) {  
-    throw new Error(error.response ? error.response.data.message : 'Failed to add course');
-  }
-};
-
-
-export const updateYogaCourse = async (courseId: string, updatedCourse: any) => {
-  try {
-    const response = await axios.put(`${BASE_URL}/admin/courses/${courseId}`, updatedCourse);
-    return response.data;
-  } catch (error: any) {  
-    throw new Error(error.response ? error.response.data.message : 'Failed to update course');
-  }
-};
-
-
-export const deleteYogaCourse = async (courseId: string) => {
-  try {
-    await axios.delete(`${BASE_URL}/admin/courses/${courseId}`);
-  } catch (error: any) {  
-    throw new Error(error.response ? error.response.data.message : 'Failed to delete course');
-  }
-};
-
-
 export const fetchUser = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/auth/user`);
@@ -131,32 +101,6 @@ export const fetchClassTypeDetails = async (classTypeId: string) => {
       return response.data;
   } catch (error: any) {  
       throw new Error(error.response ? error.response.data.message : 'Failed to fetch class type details');
-  }
-};
-
-export const addClassType = async (classType: any) => {
-  try {
-      const response = await axios.post(`${BASE_URL}/class`, classType);
-      return response.data;
-  } catch (error: any) {  
-      throw new Error(error.response ? error.response.data.message : 'Failed to add class type');
-  }
-};
-
-export const updateClassType = async (classTypeId: string, updatedClassType: any) => {
-  try {
-      const response = await axios.put(`${BASE_URL}/class/${classTypeId}`, updatedClassType);
-      return response.data;
-  } catch (error: any) {  
-      throw new Error(error.response ? error.response.data.message : 'Failed to update class type');
-  }
-};
-
-export const deleteClassType = async (classTypeId: string) => {
-  try {
-      await axios.delete(`${BASE_URL}/class/${classTypeId}`);
-  } catch (error: any) {  
-      throw new Error(error.response ? error.response.data.message : 'Failed to delete class type');
   }
 };
 

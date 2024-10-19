@@ -1,10 +1,10 @@
 const YogaCourse = require('../models/YogaCourse');
 const User = require('../models/User');
-const ClassType = require('../models/ClassType'); 
+const ClassType = require('../models/ClassType');
 
 exports.getAllCourses = async (req, res) => {
     try {
-        const courses = await YogaCourse.find().populate('classType', 'typeName');
+        const courses = await YogaCourse.find().populate('classType');
         res.json(courses);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -15,7 +15,7 @@ exports.detailCourse = async (req, res) => {
     try {
         const course = await YogaCourse.findById(req.params.id)
             .populate('participants', 'username email')
-            .populate('classType', 'typeName');
+            .populate('classType'); 
 
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
@@ -41,6 +41,23 @@ exports.detailCourse = async (req, res) => {
     }
 };
 
+exports.detailCoursePublic = async (req, res) => {
+    try {
+        const course = await YogaCourse.findById(req.params.id)
+            .populate('participants', 'username email')
+            .populate('classType'); 
+
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found' });
+        }
+
+        res.json(course);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 exports.createCourse = async (req, res) => {
     const { dayOfWeek, courseTime, capacity, duration, pricePerClass, classType, description, teacherName, location } = req.body;
     try {
@@ -61,11 +78,16 @@ exports.createCourse = async (req, res) => {
             location
         });
         await newCourse.save();
-        res.status(201).json(newCourse);
+
+        // Sử dụng populate mà không cần execPopulate
+        await newCourse.populate('classType');
+
+        res.status(201).json(newCourse); // Trả về đối tượng mới được tạo
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ message: error.message }); // Trả về chi tiết lỗi
     }
 };
+
 
 exports.updateCourse = async (req, res) => {
     try {
@@ -77,7 +99,7 @@ exports.updateCourse = async (req, res) => {
             }
         }
 
-        const updatedCourse = await YogaCourse.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('classType', 'typeName');
+        const updatedCourse = await YogaCourse.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('classType');
         if (!updatedCourse) {
             return res.status(404).json({ message: 'Course not found' });
         }
@@ -103,7 +125,7 @@ exports.deleteCourse = async (req, res) => {
 exports.joinCourse = async (req, res) => {
     try {
         const course = await YogaCourse.findById(req.params.id)
-            .populate('classType', 'typeName'); 
+            .populate('classType');
 
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
@@ -151,13 +173,12 @@ exports.searchCourses = async (req, res) => {
     }
 
     try {
-        const courses = await YogaCourse.find(filters).populate('classType', 'typeName');
+        const courses = await YogaCourse.find(filters).populate('classType');
         res.json(courses);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 exports.filterCourses = async (req, res) => {
     const { duration, classType } = req.query;
@@ -172,7 +193,7 @@ exports.filterCourses = async (req, res) => {
     }
 
     try {
-        const courses = await YogaCourse.find(filters).populate('classType', 'typeName');
+        const courses = await YogaCourse.find(filters).populate('classType');
         res.json(courses);
     } catch (error) {
         res.status(500).json({ message: error.message });
