@@ -59,18 +59,15 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
     }
   };
 
-  const handleAddToCart = async (
-    classTypeId: string,
-    pricePerClass: number
-  ) => {
+  const handleAddToCart = async (classTypeId: string, yogaCourseId: string) => {
     try {
-      await addToCart(classTypeId, pricePerClass);
+      await addToCart(classTypeId, yogaCourseId);
       Alert.alert("Success", "Class added to cart");
     } catch (error: any) {
       Alert.alert("Error", error.message || "Failed to add to cart.");
     }
   };
-
+  
   if (loading) {
     return (
       <View style={styles.center}>
@@ -119,15 +116,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
                 Date: {formatDateTime(classType.date)}
               </Text>
               <Text style={styles.classTypeText}>
-                Description:{" "}
-                {classType.description || "No Description Available"}
+                Description: {classType.description || "No Description Available"}
               </Text>
             </View>
             <TouchableOpacity
               style={styles.addToCartButton}
-              onPress={() =>
-                handleAddToCart(classType._id, course.pricePerClass)
-              }
+              onPress={() => handleAddToCart(classType._id, course._id)}
             >
               <Icon name="shopping-cart" size={24} color="#4CAF50" />
             </TouchableOpacity>

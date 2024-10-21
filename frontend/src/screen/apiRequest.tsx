@@ -176,9 +176,9 @@ export const fetchCart = async () => {
   }
 };
 
-export const addToCart = async (classTypeId: string, pricePerClass: number) => {
+export const addToCart = async (classTypeId: string, yogaCourseId: string) => {
   try {
-    const response = await axios.post(`${BASE_URL}/cart/add`, { classTypeId, pricePerClass });
+    const response = await axios.post(`${BASE_URL}/cart/add`, { classTypeId, yogaCourseId });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response ? error.response.data.message : 'Failed to add to cart');

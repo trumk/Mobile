@@ -1,5 +1,6 @@
 const Cart = require("../models/Cart");
 const ClassType = require("../models/ClassType");
+const YogaCourse = require("../models/YogaCourse");
 
 exports.getCart = async (req, res) => {
   if (!req.session.userId) {
@@ -7,12 +8,14 @@ exports.getCart = async (req, res) => {
   }
 
   try {
-    const cart = await Cart.findOne({ user: req.session.userId }).populate(
-      "items.classType"
-    );
+    const cart = await Cart.findOne({ user: req.session.userId })
+      .populate("items.classType")
+      .populate("items.yogaCourse");
+
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
     }
+
     res.status(200).json(cart);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -24,12 +27,16 @@ exports.addToCart = async (req, res) => {
     return res.status(401).json({ message: "User not authenticated" });
   }
 
-  const { classTypeId, pricePerClass } = req.body;
+  const { classTypeId, yogaCourseId, pricePerClass } = req.body;
 
   try {
-    const classType = await ClassType.findById(classTypeId);
-    if (!classType) {
-      return res.status(404).json({ message: "Class type not found" });
+    const yogaCourseObjectId = String(yogaCourseId);
+    const classTypeObjectId = String(classTypeId);
+
+    const classType = await ClassType.findById(classTypeObjectId);
+    const yogaCourse = await YogaCourse.findById(yogaCourseObjectId);
+    if (!classType || !yogaCourse) {
+      return res.status(404).json({ message: "ClassType or YogaCourse not found" });
     }
 
     let cart = await Cart.findOne({ user: req.session.userId });
@@ -38,13 +45,13 @@ exports.addToCart = async (req, res) => {
     }
 
     const existingItem = cart.items.find(
-      (item) => item.classType.toString() === classTypeId
+      (item) => item.classType.toString() === classTypeObjectId && item.yogaCourse.toString() === yogaCourseObjectId
     );
     if (existingItem) {
       return res.status(400).json({ message: "Class already in cart" });
     }
 
-    cart.items.push({ classType: classTypeId, pricePerClass });
+    cart.items.push({ classType: classTypeObjectId, yogaCourse: yogaCourseObjectId, pricePerClass });
     await cart.save();
 
     res.status(200).json({ message: "Class added to cart", cart });
@@ -52,6 +59,7 @@ exports.addToCart = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 exports.removeFromCart = async (req, res) => {
   if (!req.session.userId) {

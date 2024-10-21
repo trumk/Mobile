@@ -48,7 +48,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
 
   const calculateTotal = () => {
     return cartItems
-      .reduce((total, item) => total + (item.pricePerClass || 0), 0)
+      .reduce((total, item) => total + (item.yogaCourse.pricePerClass || 0), 0)
       .toFixed(2);
   };
 
@@ -88,7 +88,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
                     Date: {new Date(item.classType.date).toLocaleString()}
                   </Text>
                   <Text style={styles.detailText}>
-                    Price per Class: £{(item.pricePerClass || 0).toFixed(2)}
+                    Price per Class: £{(item.yogaCourse.pricePerClass || 0).toFixed(2)}
                   </Text>
                 </View>
                 <TouchableOpacity

@@ -5,6 +5,11 @@ const CartItemSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'ClassType', 
         required: true 
+    },
+    yogaCourse: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'YogaCourse', 
+        required: true 
     }
 });
 
