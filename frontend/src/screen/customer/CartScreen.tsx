@@ -46,6 +46,18 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
     }
   };
 
+  const formatDateTime = (isoString: string) => {
+    const date = new Date(isoString);
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const hours = date.getUTCHours() % 12 || 12;
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const amPm = date.getUTCHours() >= 12 ? 'PM' : 'AM';
+    
+    return `${day}-${month}-${year} ${hours}:${minutes} ${amPm}`;
+  };
+
   const calculateTotal = () => {
     return cartItems
       .reduce((total, item) => total + (item.yogaCourse.pricePerClass || 0), 0)
@@ -84,8 +96,8 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
                 <View style={styles.itemDetails}>
                   <Text style={styles.classTypeText}>{item.classType.typeName}</Text>
                   <Text style={styles.detailText}>Teacher: {item.classType.teacher}</Text>
-                  <Text style={styles.detailText}>
-                    Date: {new Date(item.classType.date).toLocaleString()}
+                  <Text style={styles.classTypeText}>
+                    Date: {formatDateTime(item.classType.date)}
                   </Text>
                   <Text style={styles.detailText}>
                     Price per Class: ${(item.yogaCourse.pricePerClass || 0).toFixed(2)}

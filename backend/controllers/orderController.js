@@ -43,14 +43,17 @@ exports.createOrder = async (req, res) => {
 };
 
 exports.getOrders = async (req, res) => {
-    if (!req.session.userId) {
-        return res.status(401).json({ message: 'User not authenticated' });
-    }
-
     try {
-        const orders = await Order.find({ user: req.session.userId })
-            .populate('items.classType')
-            .populate('items.yogaCourse');
+        const orders = await Order.find()
+            .populate('items.classType') 
+            .populate({
+                path: 'items.yogaCourse',
+                populate: {
+                    path: 'classType', 
+                    model: 'ClassType',
+                    select: '_id'
+                }
+            });
 
         if (!orders || orders.length === 0) {
             return res.status(404).json({ message: 'No orders found' });
@@ -61,6 +64,36 @@ exports.getOrders = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.getOrderById = async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    const { orderId } = req.params;
+
+    try {
+        const order = await Order.findOne({ _id: orderId, user: req.session.userId })
+            .populate('items.classType') 
+            .populate({
+                path: 'items.yogaCourse',
+                populate: {
+                    path: 'classType', 
+                    model: 'ClassType',
+                    select: '_id'
+                }
+            });
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        res.status(200).json(order);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 exports.updateOrderStatus = async (req, res) => {
     if (!req.session.userId) {

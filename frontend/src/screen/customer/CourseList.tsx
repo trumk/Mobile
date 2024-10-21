@@ -27,7 +27,6 @@ const CourseList: React.FC<CourseListProps> = ({ navigation }) => {
     const handleFilter = async (dayOfWeek: string) => {
         try {
             if (dayOfWeek === '') {
-                // Nếu dayOfWeek là chuỗi rỗng, tải lại tất cả các khóa học
                 await loadCourses();
             } else {
                 console.log('Filtering by dayOfWeek:', dayOfWeek);
