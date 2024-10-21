@@ -57,9 +57,6 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
         <TouchableOpacity onPress={() => navigation.navigate('Courses')}>
           <Text style={styles.link}>Courses</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Search")}>
-          <Text style={styles.link}>Search</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.usernameContainer}>

@@ -14,6 +14,7 @@ import { RootStackParamList } from "../../../App";
 import { addToCart, fetchCourseDetails, joinYogaCourse } from "../apiRequest";
 import QRCode from "react-native-qrcode-svg";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { format } from 'date-fns';
 
 type CourseDetailProps = {
   route: RouteProp<RootStackParamList, "Detail Course">;
@@ -45,18 +46,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
 
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
-    return date.toLocaleString();
-  };
-
-  const handleJoinCourse = async () => {
-    try {
-      const response = await joinYogaCourse(courseId);
-      Alert.alert("Success", response.message);
-      setIsJoined(true);
-      setRefresh(!refresh);
-    } catch (error: any) {
-      Alert.alert("Error", error.message);
-    }
+    return format(date, "yyyy-MM-dd HH:mm:ss 'UTC'XXX");
   };
 
   const handleAddToCart = async (classTypeId: string, yogaCourseId: string) => {

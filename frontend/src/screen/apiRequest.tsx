@@ -77,7 +77,6 @@ export const fetchUser = async () => {
   }
 };
 
-
 export const logoutUser = async () => {
   try {
     await axios.post(`${BASE_URL}/auth/logout`);
@@ -156,16 +155,17 @@ export const fetchCoursesBySearch = async (teacherName: string, dayOfWeek?: stri
   }
 };
 
-export const filterYogaCourses = async (duration: string, classType: string) => {
+export const filterYogaCourses = async (dayOfWeek: string) => {
   try {
     const response = await axios.get(`${BASE_URL}/admin/courses/filter`, {
-      params: { duration, classType },
+      params: { dayOfWeek },
     });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response ? error.response.data.message : 'Failed to filter courses');
   }
 };
+
 
 export const fetchCart = async () => {
   try {

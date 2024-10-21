@@ -1,32 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { useNavigation, NavigationProp } from "@react-navigation/native"; 
-import { fetchCoursesWithClassTypes } from "../screen/apiRequest";
+import { NavigationProp } from "@react-navigation/native"; 
 import { RootStackParamList } from "../../App";
+import { YogaCourse } from "../../types";
 
+type YogaCourseListProps = {
+  courses: YogaCourse[];
+  navigation: NavigationProp<RootStackParamList, "Detail Course">;
+};
 
-const YogaCourseList: React.FC = () => {
-  const [courses, setCourses] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
-
-  useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        const enrichedCourses = await fetchCoursesWithClassTypes();
-        setCourses(enrichedCourses);
-      } catch (error) {
-        console.error("Error loading courses:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCourses();
-  }, []);
-
-  if (loading) {
-    return <Text>Loading...</Text>;
+const YogaCourseList: React.FC<YogaCourseListProps> = ({ courses, navigation }) => {
+  if (courses.length === 0) {
+    return <Text style={styles.emptyText}>No courses available.</Text>;
   }
 
   return (
@@ -39,7 +24,7 @@ const YogaCourseList: React.FC = () => {
             <Text style={styles.courseTitle}>Day: {item.dayOfWeek}</Text>
             <Text style={styles.courseDetail}>Location: {item.location}</Text>
             <Text style={styles.courseDetail}>Capacity: {item.capacity}</Text>
-            <Text style={styles.courseDetail}>Price: ${item.pricePerClass}</Text>
+            <Text style={styles.courseDetail}>Price: ${item.pricePerClass.toFixed(2)}</Text>
 
             <TouchableOpacity
               style={styles.detailButton}
@@ -78,11 +63,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
   },
-  classType: {
-    marginTop: 10,
-  },
-  classTypeText: {
-    fontSize: 14,
+  emptyText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "#888",
+    marginTop: 50,
   },
   detailButton: {
     backgroundColor: "#2a7183",

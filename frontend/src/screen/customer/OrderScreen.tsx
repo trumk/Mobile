@@ -45,7 +45,7 @@ const OrderScreen: React.FC = () => {
                 renderItem={({ item }) => (
                     <View style={styles.orderCard}>
                         <Text style={styles.orderDetail}>Order ID: {item._id}</Text>
-                        <Text style={styles.orderDetail}>Total Amount: £{item.totalAmount}</Text>
+                        <Text style={styles.orderDetail}>Total Amount: ${item.totalAmount}</Text>
                         <Text style={styles.orderDetail}>Status: {item.status}</Text>
                         <Text style={styles.orderDetail}>Number of Items: {item.items.length}</Text>
                         <TouchableOpacity style={styles.detailButton}>

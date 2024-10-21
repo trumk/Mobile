@@ -6,9 +6,10 @@ const OrderItemSchema = new mongoose.Schema({
         ref: 'ClassType', 
         required: true 
     },
-    pricePerClass: { 
-        type: Number, 
-        required: true 
+    yogaCourse: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'YogaCourse',
+        required: true
     }
 });
 

@@ -198,15 +198,11 @@ exports.searchCourses = async (req, res) => {
 
 
 exports.filterCourses = async (req, res) => {
-    const { duration, classType } = req.query;
+    const { dayOfWeek } = req.query;
     let filters = {};
 
-    if (duration) {
-        filters.duration = parseInt(duration, 10); 
-    }
-
-    if (classType) {
-        filters.classType = classType;
+    if (dayOfWeek) {
+        filters.dayOfWeek = dayOfWeek;
     }
 
     try {

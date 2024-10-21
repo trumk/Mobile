@@ -1,38 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { fetchClassTypes } from '../screen/apiRequest'; 
-import { ClassType } from '../../types';
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 
 type FilterProps = {
-  onFilter: (duration: string, classType: string) => void; 
+  onFilter: (dayOfWeek: string) => void;
 };
 
-const durationOptions = [30, 60, 120]; 
+const dayOptions = [
+  { label: "Monday", value: "Monday" },
+  { label: "Tuesday", value: "Tuesday" },
+  { label: "Wednesday", value: "Wednesday" },
+  { label: "Thursday", value: "Thursday" },
+  { label: "Friday", value: "Friday" },
+  { label: "Saturday", value: "Saturday" },
+  { label: "Sunday", value: "Sunday" },
+];
 
 const Filter: React.FC<FilterProps> = ({ onFilter }) => {
-  const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
-  const [selectedClassType, setSelectedClassType] = useState<string>('');
-  const [classTypes, setClassTypes] = useState<ClassType[]>([]);
+  const [selectedDay, setSelectedDay] = useState<string>("");
   const [isDropdownVisible, setDropdownVisible] = useState(false);
 
-  useEffect(() => {
-    const loadClassTypes = async () => {
-      try {
-        const data = await fetchClassTypes();
-        setClassTypes(data);
-      } catch (error) {
-        console.error('Failed to fetch class types:', error);
-      }
-    };
-
-    loadClassTypes();
-  }, []);
-
   const handleApplyFilter = () => {
-    const durationString = selectedDuration !== null ? selectedDuration.toString() : ""; 
-    onFilter(durationString, selectedClassType);
-    setDropdownVisible(false); // Ẩn dropdown sau khi áp dụng bộ lọc
+    if (selectedDay === "") {
+      onFilter("");
+    } else {
+      onFilter(selectedDay);
+    }
+    setDropdownVisible(false);
   };
 
   return (
@@ -52,35 +46,35 @@ const Filter: React.FC<FilterProps> = ({ onFilter }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.dropdownContainer}>
-            <Text style={styles.label}>Filter by Duration</Text>
+            <Text style={styles.label}>Filter by Day of the Week</Text>
             <Picker
-              selectedValue={selectedDuration}
-              onValueChange={(itemValue) => setSelectedDuration(itemValue)}
+              selectedValue={selectedDay}
+              onValueChange={(itemValue) => {
+                setSelectedDay(itemValue);
+              }}
               style={styles.picker}
             >
-              <Picker.Item label="Select Duration" value={null} />
-              {durationOptions.map((option) => (
-                <Picker.Item key={option} label={`${option} minutes`} value={option} />
+              <Picker.Item label="Select Day" value="" />
+              {dayOptions.map((option) => (
+                <Picker.Item
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                />
               ))}
             </Picker>
 
-            <Text style={styles.label}>Filter by Class Type</Text>
-            <Picker
-              selectedValue={selectedClassType}
-              onValueChange={(itemValue) => setSelectedClassType(itemValue)}
-              style={styles.picker}
+            <TouchableOpacity
+              style={styles.applyButton}
+              onPress={handleApplyFilter}
             >
-              <Picker.Item label="Select Class Type" value="" />
-              {classTypes.map((classType) => (
-                <Picker.Item key={classType._id} label={classType.typeName} value={classType._id} />
-              ))}
-            </Picker>
-
-            <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilter}>
               <Text style={styles.applyButtonText}>Apply Filters</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.closeButton} onPress={() => setDropdownVisible(false)}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setDropdownVisible(false)}
+            >
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -92,66 +86,66 @@ const Filter: React.FC<FilterProps> = ({ onFilter }) => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 10,
-    backgroundColor: '#f0f4f8',
+    backgroundColor: "#f0f4f8",
   },
   filterButton: {
-    backgroundColor: '#1e90ff',
+    backgroundColor: "#1e90ff",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
   },
   filterButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   dropdownContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
+    width: "80%",
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   picker: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
   },
   applyButton: {
-    backgroundColor: '#1e90ff',
+    backgroundColor: "#1e90ff",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     marginTop: 10,
   },
   applyButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   closeButton: {
-    backgroundColor: '#ff4d4d',
+    backgroundColor: "#ff4d4d",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     marginTop: 10,
   },
   closeButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

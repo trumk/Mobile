@@ -5,11 +5,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { YogaCourse } from '../../../types';
 import { fetchCourses, filterYogaCourses } from '../apiRequest';
-import { RootStackParamList } from '../../../App'; 
-import Filter from '../../components/Filter'; 
+import { RootStackParamList } from '../../../App';
+import Filter from '../../components/Filter';
 
 type CourseListProps = {
-    navigation: StackNavigationProp<RootStackParamList, 'Detail Course'>; 
+    navigation: StackNavigationProp<RootStackParamList, 'Detail Course'>;
 };
 
 const CourseList: React.FC<CourseListProps> = ({ navigation }) => {
@@ -17,17 +17,24 @@ const CourseList: React.FC<CourseListProps> = ({ navigation }) => {
 
     const loadCourses = async () => {
         try {
-            const data = await fetchCourses(); 
+            const data = await fetchCourses();
             setCourses(data);
         } catch (error) {
             console.error('Error fetching yoga courses:', error);
         }
     };
 
-    const handleFilter = async (duration: string, classType: string) => {
+    const handleFilter = async (dayOfWeek: string) => {
         try {
-            const data = await filterYogaCourses(duration, classType);
-            setCourses(data);
+            if (dayOfWeek === '') {
+                // Nếu dayOfWeek là chuỗi rỗng, tải lại tất cả các khóa học
+                await loadCourses();
+            } else {
+                console.log('Filtering by dayOfWeek:', dayOfWeek);
+                const data = await filterYogaCourses(dayOfWeek);
+                console.log('Filtered data:', data);
+                setCourses(data);
+            }
         } catch (error) {
             console.error('Failed to filter courses:', error);
         }

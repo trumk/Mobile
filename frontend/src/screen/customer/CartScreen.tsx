@@ -88,7 +88,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
                     Date: {new Date(item.classType.date).toLocaleString()}
                   </Text>
                   <Text style={styles.detailText}>
-                    Price per Class: £{(item.yogaCourse.pricePerClass || 0).toFixed(2)}
+                    Price per Class: ${(item.yogaCourse.pricePerClass || 0).toFixed(2)}
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -101,7 +101,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
             )}
           />
           <View style={styles.totalContainer}>
-            <Text style={styles.totalText}>Total: £{calculateTotal()}</Text>
+            <Text style={styles.totalText}>Total: ${calculateTotal()}</Text>
           </View>
           <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
             <Text style={styles.checkoutButtonText}>Checkout</Text>
