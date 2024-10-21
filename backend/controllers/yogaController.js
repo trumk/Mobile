@@ -65,13 +65,11 @@ exports.createCourse = async (req, res) => {
             return res.status(400).json({ message: 'A valid class type is required' });
         }
 
-        // Tìm tất cả các ClassType dựa trên _id và xác minh tất cả đều tồn tại
         const classTypes = await ClassType.find({ _id: { $in: classType.map(ct => ct._id) } });
         if (classTypes.length !== classType.length) {
             return res.status(400).json({ message: 'Some class types were not found' });
         }
 
-        // Kiểm tra xem đã có khóa học nào với cùng lớp học và ngày đó chưa
         const existingCourse = await YogaCourse.findOne({
             dayOfWeek: dayOfWeek,
             'classType._id': { $in: classTypes.map(ct => ct._id) }

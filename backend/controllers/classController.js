@@ -21,21 +21,6 @@ exports.getClassTypeById = async (req, res) => {
     }
 };
 
-exports.getClassTypesByIds = async (req, res) => {
-    const { ids } = req.body; 
-
-    if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'A list of IDs is required' });
-    }
-
-    try {
-        const classTypes = await ClassType.find({ _id: { $in: ids } });
-        res.json(classTypes);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
 exports.createClassType = async (req, res) => {
     const { typeName, description, teacher, date } = req.body;
     try {

@@ -6,11 +6,12 @@ const MongoStore = require('connect-mongo');
 const authRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes'); 
 const classRoutes = require('./routes/classRoutes'); 
+const cartRoutes = require('./routes/cartRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 require('dotenv').config();
 
 const app = express();
 
-// Middleware
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
@@ -27,6 +28,8 @@ app.use(session({
 app.use('/api/auth', authRoutes); 
 app.use('/api/admin', courseRoutes); 
 app.use('/api/class', classRoutes); 
+app.use('/api/cart', cartRoutes); 
+app.use('/api/order', orderRoutes); 
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
