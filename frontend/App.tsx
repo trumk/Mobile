@@ -8,6 +8,8 @@ import ProfileScreen from './src/screen/customer/ProfileScreen';
 import CourseList from './src/screen/customer/CourseList';
 import CourseDetail from './src/screen/customer/CourseDetail';
 import SearchScreen from './src/screen/customer/SearchScreen';
+import CartScreen from './src/screen/customer/CartScreen';
+import OrderScreen from './src/screen/customer/OrderScreen';
 
 export type RootStackParamList = {
     Home: undefined;
@@ -18,7 +20,8 @@ export type RootStackParamList = {
     Profile: undefined;
     Courses: undefined;
     Search: undefined; 
-
+    Cart: undefined; 
+    Orders: { order: any };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -36,6 +39,8 @@ const App = () => {
                 <Stack.Screen name="Courses" component={CourseList} />
                 <Stack.Screen name="Detail Course" component={CourseDetail} />
                 <Stack.Screen name="Search" component={SearchScreen} /> 
+                <Stack.Screen name="Cart" component={CartScreen} /> 
+                <Stack.Screen name="Orders" component={OrderScreen} /> 
             </Stack.Navigator>
         </NavigationContainer>
     );

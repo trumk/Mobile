@@ -71,6 +71,12 @@ const Navbar: React.FC<NavbarProps> = ({ onLinkPress }) => {
             <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
               <Text style={styles.dropdownItem}>Profile</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+              <Text style={styles.dropdownItem}>My Cart</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Orders')}>
+              <Text style={styles.dropdownItem}>My Order</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={handleLogout}>
               <Text style={styles.dropdownItem}>Logout</Text>
             </TouchableOpacity>

@@ -22,13 +22,14 @@ exports.getClassTypeById = async (req, res) => {
 };
 
 exports.createClassType = async (req, res) => {
-    const { typeName, description, teacher, date } = req.body;
+    const { typeName, description, teacher, date, duration } = req.body;
     try {
         const newClassType = new ClassType({
             typeName,
             description,
             teacher,
-            date
+            date,
+            duration
         });
         await newClassType.save();
         res.status(201).json(newClassType);
@@ -39,10 +40,10 @@ exports.createClassType = async (req, res) => {
 
 exports.updateClassType = async (req, res) => {
     try {
-        const { typeName, description, teacher, date } = req.body;
+        const { typeName, description, teacher, date, duration } = req.body;
         const updatedClassType = await ClassType.findByIdAndUpdate(
             req.params.id,
-            { typeName, description, teacher, date },
+            { typeName, description, teacher, date, duration },
             { new: true }
         );
         if (!updatedClassType) {

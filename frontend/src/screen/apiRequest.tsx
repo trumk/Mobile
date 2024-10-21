@@ -104,6 +104,34 @@ export const fetchClassTypeDetails = async (classTypeId: string) => {
   }
 };
 
+export const fetchCoursesWithClassTypes = async () => {
+  try {
+    const coursesResponse = await axios.get(`${BASE_URL}/admin/courses`);
+    const courses = coursesResponse.data;
+
+    const classTypesResponse = await axios.get(`${BASE_URL}/class`);
+    const classTypes = classTypesResponse.data;
+    const classTypeMap = new Map();
+    classTypes.forEach((classType: any) => {
+      classTypeMap.set(classType._id.toString(), classType);
+    });
+
+    const enrichedCourses = courses.map((course: any) => {
+      const enrichedClassTypes = course.classType.map((classTypeId: any) => {
+        return classTypeMap.get(classTypeId.toString()) || null;
+      }).filter((classType: any) => classType !== null);
+
+      return {
+        ...course,
+        classTypeDetails: enrichedClassTypes, 
+      };
+    });
+
+    return enrichedCourses;
+  } catch (error: any) {
+    throw new Error(error.response ? error.response.data.message : 'Failed to fetch courses with class types');
+  }
+};
 
 export const joinYogaCourse = async (courseId: string) => {
   try {
@@ -114,7 +142,6 @@ export const joinYogaCourse = async (courseId: string) => {
     throw new Error(error.response ? error.response.data.message : 'Failed to join the course');
   }
 };
-
 
 export const fetchCoursesBySearch = async (teacherName: string, dayOfWeek?: string | null) => {
   try {
@@ -129,7 +156,6 @@ export const fetchCoursesBySearch = async (teacherName: string, dayOfWeek?: stri
   }
 };
 
-
 export const filterYogaCourses = async (duration: string, classType: string) => {
   try {
     const response = await axios.get(`${BASE_URL}/admin/courses/filter`, {
@@ -138,5 +164,50 @@ export const filterYogaCourses = async (duration: string, classType: string) => 
     return response.data;
   } catch (error: any) {
     throw new Error(error.response ? error.response.data.message : 'Failed to filter courses');
+  }
+};
+
+export const fetchCart = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/cart`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response ? error.response.data.message : 'Failed to fetch cart');
+  }
+};
+
+export const addToCart = async (classTypeId: string, pricePerClass: number) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/cart/add`, { classTypeId, pricePerClass });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response ? error.response.data.message : 'Failed to add to cart');
+  }
+};
+
+export const removeFromCart = async (classTypeId: string) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/cart/remove`, { classTypeId });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response ? error.response.data.message : 'Failed to remove from cart');
+  }
+};
+
+export const createOrder = async () => {
+  try {
+    const response = await axios.post(`${BASE_URL}/order/create`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response ? error.response.data.message : 'Failed to create order');
+  }
+};
+
+export const fetchOrders = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/order`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response ? error.response.data.message : 'Failed to fetch orders');
   }
 };

@@ -16,6 +16,10 @@ const ClassTypeSchema = new mongoose.Schema({
     date: { 
         type: Date, 
         required: true 
+    },
+    duration: { 
+        type: Number, 
+        required: true 
     }
 });
 

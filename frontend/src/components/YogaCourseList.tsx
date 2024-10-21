@@ -1,111 +1,58 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-} from "react-native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { fetchUserDetails } from "../screen/apiRequest";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native"; 
+import { fetchCoursesWithClassTypes } from "../screen/apiRequest";
 import { RootStackParamList } from "../../App";
-import { YogaCourse } from "../../types"; 
 
-type YogaCourseListProps = {
-  courses: YogaCourse[];
-  navigation: StackNavigationProp<RootStackParamList, "Detail Course">;
-};
 
-const formatTime = (isoString: string) => {
-  const date = new Date(isoString);
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const ampm = hours >= 12 ? "PM" : "AM";
-  const formattedHours = hours % 12 || 12;
-  const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-  return `${formattedHours}:${formattedMinutes} ${ampm}`;
-};
-
-const YogaCourseList: React.FC<YogaCourseListProps> = ({
-  courses,
-  navigation,
-}) => {
-  const [userCourses, setUserCourses] = useState<string[]>([]);
+const YogaCourseList: React.FC = () => {
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
 
   useEffect(() => {
-    const getUserDetails = async () => {
+    const loadCourses = async () => {
       try {
-        const user = await fetchUserDetails();
-        setUserCourses(user.courses.map((course: any) => course._id)); 
+        const enrichedCourses = await fetchCoursesWithClassTypes();
+        setCourses(enrichedCourses);
       } catch (error) {
-        console.error("Error fetching user details:", error);
+        console.error("Error loading courses:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    getUserDetails();
+    loadCourses();
   }, []);
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <View style={styles.container}>
-  <FlatList
-  data={courses}
-  keyExtractor={(item) => item._id}
-  renderItem={({ item }) => {
-    const hasJoined = userCourses.includes(item._id);
+      <FlatList
+        data={courses}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <View style={styles.courseCard}>
+            <Text style={styles.courseTitle}>Day: {item.dayOfWeek}</Text>
+            <Text style={styles.courseDetail}>Location: {item.location}</Text>
+            <Text style={styles.courseDetail}>Capacity: {item.capacity}</Text>
+            <Text style={styles.courseDetail}>Price: ${item.pricePerClass}</Text>
 
-    return (
-      <View
-        style={[
-          styles.courseCard,
-          item.capacity === 0 && !hasJoined && styles.courseFull,
-        ]}
-      >
-        <View style={styles.courseHeader}>
-          <Text style={styles.courseType}>
-            {item.classType?.typeName || 'Unknown Class Type'}
-          </Text>
-          <Text style={styles.teacherName}>
-            by {item.teacherName || 'Unknown Teacher'} 
-          </Text>
-        </View>
-        <View style={styles.courseDetails}>
-          <Text style={styles.courseDetailText}>
-            Day: {item.dayOfWeek || 'N/A'} 
-          </Text>
-          <Text style={styles.courseDetailText}>
-            Time: {item.courseTime ? formatTime(item.courseTime) : 'N/A'}
-          </Text>
-          <Text style={styles.courseDetailText}>
-            Location: {item.location || 'Unknown Location'} 
-          </Text>
-          <Text style={styles.courseDetailText}>
-            Duration: {item.duration ? `${item.duration} minutes` : 'N/A'} 
-          </Text>
-          <Text style={styles.courseDetailText}>
-            Capacity: {item.capacity === 0 ? 'Fully booked' : item.capacity}
-          </Text>
-        </View>
-
-        {hasJoined || item.capacity > 0 ? (
-          <TouchableOpacity
-          style={styles.detailButton}
-          onPress={() => {
-            navigation.navigate("Detail Course", { courseId: item._id });
-          }}
-        >
-          <Text style={styles.detailButtonText}>View Details</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.fullNotice}>
-          <Text style={styles.fullNoticeText}>Full</Text>
-        </View>
-      )}
-      </View>
-    );
-  }}
-/>
-
-</View>
+            <TouchableOpacity
+              style={styles.detailButton}
+              onPress={() => {
+                navigation.navigate("Detail Course", { courseId: item._id });
+              }}
+            >
+              <Text style={styles.detailButtonText}>View Details</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      />
+    </View>
   );
 };
 
@@ -121,56 +68,30 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginBottom: 20,
     elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
-  courseFull: {
-    opacity: 0.5,
-  },
-  courseHeader: {
-    marginBottom: 15,
-  },
-  courseType: {
+  courseTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#2C3E50",
+    marginBottom: 10,
+  },
+  courseDetail: {
+    fontSize: 16,
     marginBottom: 5,
   },
-  teacherName: {
-    fontSize: 16,
-    color: "#8e8e93",
+  classType: {
+    marginTop: 10,
   },
-  courseDetails: {
-    marginBottom: 20,
-  },
-  courseDetailText: {
-    fontSize: 16,
-    color: "#34495e",
-    marginBottom: 5,
+  classTypeText: {
+    fontSize: 14,
   },
   detailButton: {
     backgroundColor: "#2a7183",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
+    marginTop: 10,
   },
   detailButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  fullNotice: {
-    backgroundColor: "#f44336",
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  fullNoticeText: {
     color: "#ffffff",
     fontSize: 16,
     fontWeight: "bold",
