@@ -8,4 +8,7 @@ router.post('/', classController.createClassType);
 router.put('/:id', classController.updateClassType);
 router.delete('/:id', classController.deleteClassType);
 
+router.post('/ids', classController.getClassTypesByIds);
+
+
 module.exports = router;

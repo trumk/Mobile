@@ -57,58 +57,96 @@ exports.detailCoursePublic = async (req, res) => {
     }
 };
 
-
 exports.createCourse = async (req, res) => {
-    const { dayOfWeek, courseTime, capacity, duration, pricePerClass, classType, description, teacherName, location } = req.body;
+    const { dayOfWeek, capacity, pricePerClass, classType, location } = req.body;
+
     try {
-        const classTypeDoc = await ClassType.findById(classType);
-        if (!classTypeDoc) {
-            return res.status(400).json({ message: 'Invalid class type' });
+        if (!classType || !Array.isArray(classType) || classType.length === 0) {
+            return res.status(400).json({ message: 'A valid class type is required' });
         }
 
+        // Tìm tất cả các ClassType dựa trên _id và xác minh tất cả đều tồn tại
+        const classTypes = await ClassType.find({ _id: { $in: classType.map(ct => ct._id) } });
+        if (classTypes.length !== classType.length) {
+            return res.status(400).json({ message: 'Some class types were not found' });
+        }
+
+        // Kiểm tra xem đã có khóa học nào với cùng lớp học và ngày đó chưa
+        const existingCourse = await YogaCourse.findOne({
+            dayOfWeek: dayOfWeek,
+            'classType._id': { $in: classTypes.map(ct => ct._id) }
+        });
+
+        if (existingCourse) {
+            return res.status(400).json({ message: 'A course with the same class type and day already exists' });
+        }
+
+        // Tạo khóa học mới với danh sách các đối tượng ClassType
         const newCourse = new YogaCourse({
-            dayOfWeek, 
-            courseTime, 
-            capacity, 
-            duration, 
-            pricePerClass, 
-            classType, 
-            description, 
-            teacherName, 
+            dayOfWeek,
+            capacity,
+            pricePerClass,
+            classType: classTypes, // Lưu danh sách các đối tượng ClassType
             location
         });
+
         await newCourse.save();
+        await newCourse.populate('classType'); // Populate để lấy đầy đủ thông tin của classType
 
-        // Sử dụng populate mà không cần execPopulate
-        await newCourse.populate('classType');
-
-        res.status(201).json(newCourse); // Trả về đối tượng mới được tạo
+        res.status(201).json(newCourse);
     } catch (error) {
-        res.status(400).json({ message: error.message }); // Trả về chi tiết lỗi
+        res.status(400).json({ message: error.message });
     }
 };
 
-
 exports.updateCourse = async (req, res) => {
+    const { classType, dayOfWeek } = req.body;
+
     try {
-        const { classType } = req.body;
+        let updatedClassTypes = null;
+
+        // Kiểm tra và tìm tất cả các ClassType dựa trên _id nếu cần cập nhật
         if (classType) {
-            const classTypeDoc = await ClassType.findById(classType);
-            if (!classTypeDoc) {
-                return res.status(400).json({ message: 'Invalid class type' });
+            if (!Array.isArray(classType) || classType.length === 0) {
+                return res.status(400).json({ message: 'A valid class type is required' });
             }
+
+            const classTypes = await ClassType.find({ _id: { $in: classType.map(ct => ct._id) } });
+            if (classTypes.length !== classType.length) {
+                return res.status(400).json({ message: 'Some class types were not found' });
+            }
+
+            updatedClassTypes = classTypes; // Gán danh sách các đối tượng ClassType đã được tìm thấy
         }
 
-        const updatedCourse = await YogaCourse.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('classType');
+        // Kiểm tra xem có khóa học khác với cùng lớp học và ngày đó không
+        const existingCourse = await YogaCourse.findOne({
+            _id: { $ne: req.params.id }, // Loại trừ khóa học hiện tại
+            dayOfWeek: dayOfWeek,
+            'classType._id': { $in: updatedClassTypes.map(ct => ct._id) }
+        });
+
+        if (existingCourse) {
+            return res.status(400).json({ message: 'Another course with the same class type and day already exists' });
+        }
+
+        // Tạo dữ liệu cập nhật cho khóa học
+        const updatedData = { ...req.body };
+        if (updatedClassTypes) {
+            updatedData.classType = updatedClassTypes;
+        }
+
+        // Cập nhật khóa học
+        const updatedCourse = await YogaCourse.findByIdAndUpdate(req.params.id, updatedData, { new: true }).populate('classType');
         if (!updatedCourse) {
             return res.status(404).json({ message: 'Course not found' });
         }
         res.json(updatedCourse);
     } catch (error) {
-        console.error('Error updating course:', error);  
         res.status(400).json({ message: 'Failed to update course', error: error.message });
     }
 };
+
 
 exports.deleteCourse = async (req, res) => {
     try {
@@ -147,6 +185,7 @@ exports.joinCourse = async (req, res) => {
         if (user.courses.includes(course._id)) {
             return res.status(400).json({ message: 'You have already joined this course' });
         }
+
         course.participants.push(user._id);
         course.capacity -= 1;
         await course.save();
@@ -164,21 +203,23 @@ exports.searchCourses = async (req, res) => {
     const { teacherName, dayOfWeek } = req.query;
     let filters = {};
 
-    if (teacherName) {
-        filters.teacherName = { $regex: teacherName, $options: 'i' };
-    }
-
     if (dayOfWeek) {
         filters.dayOfWeek = dayOfWeek;
     }
 
     try {
         const courses = await YogaCourse.find(filters).populate('classType');
-        res.json(courses);
+
+        const filteredCourses = courses.filter(course => 
+            !teacherName || course.classType.some(ct => ct.teacher.match(new RegExp(teacherName, 'i')))
+        );
+
+        res.json(filteredCourses);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 exports.filterCourses = async (req, res) => {
     const { duration, classType } = req.query;

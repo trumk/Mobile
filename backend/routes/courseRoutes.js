@@ -1,18 +1,7 @@
 const express = require('express');
-const { 
-    getAllCourses, 
-    createCourse, 
-    updateCourse, 
-    deleteCourse, 
-    detailCourse, 
-    joinCourse, 
-    searchCourses, 
-    filterCourses, 
-    detailCoursePublic
-} = require('../controllers/yogaController');
+const { searchCourses, getAllCourses, detailCourse, detailCoursePublic, joinCourse, createCourse, updateCourse, deleteCourse, filterCourses } = require('../controllers/yogaController');
+
 const router = express.Router();
-
-
 
 router.get('/courses/search', searchCourses);   
 router.get('/courses/filter', filterCourses);         
