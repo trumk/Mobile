@@ -11,7 +11,7 @@ import {
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../App";
-import { addToCart, fetchCourseDetails, joinYogaCourse } from "../apiRequest";
+import { addToCart, fetchCourseDetails } from "../apiRequest";
 import QRCode from "react-native-qrcode-svg";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { format } from 'date-fns';
@@ -56,9 +56,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
     return `${day}-${month}-${year} ${hours}:${minutes} ${amPm}`;
   };
   
-
   const handleAddToCart = async (classTypeId: string, yogaCourseId: string) => {
     try {
+      if (course.capacity === 0) {
+        Alert.alert("Cannot Add to Cart", "This class is fully booked.");
+        return;
+      }
       await addToCart(classTypeId, yogaCourseId);
       Alert.alert("Success", "Class added to cart");
     } catch (error: any) {
@@ -69,7 +72,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#1E5B75" />
+        <ActivityIndicator size="large" color="#4CAF50" />
       </View>
     );
   }
@@ -90,18 +93,20 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
     );
   }
 
+  const isFull = course.capacity === 0;
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Course: {course.dayOfWeek || "N/A"}</Text>
       <Text style={styles.details}>Location: {course.location || "N/A"}</Text>
       <Text style={styles.details}>
-        Capacity: {course.capacity || "Full"} person(s)
+        Capacity: {isFull ? "Full" : `${course.capacity} person(s)`}
       </Text>
       <Text style={styles.details}>
         Price per Class: ${course.pricePerClass || "N/A"}
       </Text>
 
-      <Text style={styles.sectionTitle}>Class Infos:</Text>
+      <Text style={styles.sectionTitle}>Class Information:</Text>
       {course.classType && course.classType.length > 0 ? (
         course.classType.map((classType: any) => (
           <View key={classType._id} style={styles.classTypeCard}>
@@ -118,15 +123,42 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
               </Text>
             </View>
             <TouchableOpacity
-              style={styles.addToCartButton}
+              style={[
+                styles.addToCartButton,
+                isFull ? styles.disabledButton : {},
+              ]}
               onPress={() => handleAddToCart(classType._id, course._id)}
+              disabled={isFull}
             >
-              <Icon name="shopping-cart" size={24} color="#4CAF50" />
+              <Icon name="shopping-cart" size={24} color={isFull ? "#888" : "#4CAF50"} />
             </TouchableOpacity>
           </View>
         ))
       ) : (
         <Text style={styles.noClassTypeText}>No Class Types Available</Text>
+      )}
+
+      <Text style={styles.participantsTitle}>Participants:</Text>
+      {course.participants && course.participants.length > 0 ? (
+        course.participants.map((participant: any) => (
+          <Text key={participant._id} style={styles.participantText}>
+            {participant.username} - {participant.email}
+          </Text>
+        ))
+      ) : (
+        <Text style={styles.noParticipants}>No participants yet</Text>
+      )}
+
+      {isJoined && (
+        <View style={styles.qrContainer}>
+          <Text style={styles.qrText}>Your QR Code:</Text>
+          <QRCode
+            value={`Course ID: ${course._id}\nCourse: ${course.dayOfWeek}\nLocation: ${course.location}\nDate: ${formatDateTime(course.classType[0]?.date)}\nPrice: $${course.pricePerClass}`}
+            size={200}
+            color="#1E5B75"
+            backgroundColor="white"
+          />
+        </View>
       )}
     </ScrollView>
   );
@@ -136,7 +168,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#f0f8ff",
   },
   center: {
     flex: 1,
@@ -144,29 +176,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1E5B75",
-    marginBottom: 20,
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#4CAF50",
+    marginBottom: 15,
   },
   details: {
     fontSize: 18,
-    marginBottom: 12,
-    color: "#34495E",
+    marginBottom: 10,
+    color: "#555",
+    lineHeight: 22,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#1E5B75",
-    marginVertical: 15,
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#4CAF50",
+    marginVertical: 20,
   },
   classTypeCard: {
     flexDirection: "row",
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
-    elevation: 3,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -175,54 +212,49 @@ const styles = StyleSheet.create({
   },
   classTypeText: {
     fontSize: 16,
-    color: "#34495E",
+    color: "#333",
     marginBottom: 5,
   },
   addToCartButton: {
-    marginLeft: 10,
+    marginLeft: 15,
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
   noClassTypeText: {
     fontSize: 16,
     color: "#888",
+    textAlign: "center",
   },
   participantsTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    marginVertical: 15,
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#4CAF50",
+    marginVertical: 20,
   },
   participantText: {
     fontSize: 16,
-    color: "#cd6c6c",
+    color: "#555",
+    lineHeight: 24,
   },
   noParticipants: {
     fontSize: 16,
     color: "#888",
   },
-  buttonContainer: {
-    marginTop: 30,
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: "#1E5B75",
-    paddingVertical: 10,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: "#ffffff",
-    fontWeight: "600",
-    fontSize: 16,
-  },
   qrContainer: {
     marginTop: 30,
     alignItems: "center",
+    paddingVertical: 20,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    backgroundColor: "#fff",
   },
   qrText: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#1E5B75",
-    marginBottom: 20,
+    fontWeight: "700",
+    color: "#4CAF50",
+    marginBottom: 10,
   },
   errorText: {
     fontSize: 18,

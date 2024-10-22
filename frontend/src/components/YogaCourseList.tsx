@@ -19,23 +19,42 @@ const YogaCourseList: React.FC<YogaCourseListProps> = ({ courses, navigation }) 
       <FlatList
         data={courses}
         keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={styles.courseCard}>
-            <Text style={styles.courseTitle}>Day: {item.dayOfWeek}</Text>
-            <Text style={styles.courseDetail}>Location: {item.location}</Text>
-            <Text style={styles.courseDetail}>Capacity: {item.capacity}</Text>
-            <Text style={styles.courseDetail}>Price: ${item.pricePerClass.toFixed(2)}</Text>
+        renderItem={({ item }) => {
+          const isFull = item.capacity === 0;
+          const isJoined = item.isJoined || false;
 
-            <TouchableOpacity
-              style={styles.detailButton}
-              onPress={() => {
-                navigation.navigate("Detail Course", { courseId: item._id });
-              }}
+          return (
+            <View
+              style={[
+                styles.courseCard,
+                isFull && !isJoined ? styles.fullCourse : {},
+              ]}
             >
-              <Text style={styles.detailButtonText}>View Details</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+              <Text style={styles.courseTitle}>Day: {item.dayOfWeek}</Text>
+              <Text style={styles.courseDetail}>Location: {item.location}</Text>
+              <Text style={styles.courseDetail}>
+                Capacity: {isFull ? "Full" : item.capacity}
+              </Text>
+              <Text style={styles.courseDetail}>
+                Price: ${item.pricePerClass.toFixed(2)}
+              </Text>
+
+              <TouchableOpacity
+                style={[styles.detailButton, isFull && !isJoined ? styles.disabledButton : {}]}
+                onPress={() => {
+                  if (!isFull || isJoined) {
+                    navigation.navigate("Detail Course", { courseId: item._id });
+                  }
+                }}
+                disabled={isFull && !isJoined}
+              >
+                <Text style={styles.detailButtonText}>
+                  {isFull && !isJoined ? "Full" : "View Details"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          );
+        }}
       />
     </View>
   );
@@ -53,6 +72,9 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginBottom: 20,
     elevation: 3,
+  },
+  fullCourse: {
+    opacity: 0.5,
   },
   courseTitle: {
     fontSize: 20,
@@ -75,6 +97,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     marginTop: 10,
+  },
+  disabledButton: {
+    backgroundColor: "#888",
   },
   detailButtonText: {
     color: "#ffffff",

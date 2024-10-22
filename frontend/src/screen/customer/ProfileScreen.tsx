@@ -73,16 +73,24 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.detailItem}>{user?.role}</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Courses</Text>
+        <Text style={styles.sectionTitle}>Courses Enrolled</Text>
         {user?.courses && user.courses.length > 0 ? (
           user.courses.map((course: any) => (
             <View key={course._id} style={styles.courseCard}>
               <Text style={styles.courseName}>
-                {course.classType?.typeName || "Unknown Class Type"}
+                {course.classType?.[0]?.typeName || "Unknown Class Type"}
               </Text>
-
-              <Text style={styles.teacherName}>
-                Instructor: {course.teacherName}
+              <Text style={styles.courseDetail}>
+                Day of the Week: {course.dayOfWeek}
+              </Text>
+              <Text style={styles.courseDetail}>
+                Location: {course.location}
+              </Text>
+              <Text style={styles.courseDetail}>
+                Price per Class: ${course.pricePerClass}
+              </Text>
+              <Text style={styles.courseDetail}>
+                Participants: {course.participants.length}
               </Text>
             </View>
           ))
@@ -184,9 +192,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1c2f28",
   },
-  teacherName: {
+  courseDetail: {
     fontSize: 16,
-    color: "#cd6f5e",
+    color: "#777",
     marginTop: 5,
   },
   noCourses: {

@@ -65,35 +65,34 @@ exports.getOrders = async (req, res) => {
     }
 };
 
-exports.getOrderById = async (req, res) => {
+exports.getOrdersByUserId = async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ message: 'User not authenticated' });
     }
 
-    const { orderId } = req.params;
+    const { userId } = req.params;
 
     try {
-        const order = await Order.findOne({ _id: orderId, user: req.session.userId })
+        const orders = await Order.find({ user: userId })
             .populate('items.classType') 
             .populate({
                 path: 'items.yogaCourse',
                 populate: {
-                    path: 'classType', 
+                    path: 'classType',
                     model: 'ClassType',
                     select: '_id'
                 }
             });
 
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ message: 'No orders found for this user' });
         }
 
-        res.status(200).json(order);
+        res.status(200).json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 exports.updateOrderStatus = async (req, res) => {
     const { orderId, status } = req.body;
@@ -109,22 +108,18 @@ exports.updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // Nếu trạng thái hiện tại của đơn hàng là "Completed" và trạng thái mới là "Pending" hoặc "Cancelled"
         if (order.status === 'Completed' && (status === 'Pending' || status === 'Cancelled')) {
             for (const item of order.items) {
                 const yogaCourse = await YogaCourse.findById(item.yogaCourse);
                 
-                // Tăng capacity của khóa học
                 if (yogaCourse) {
                     yogaCourse.capacity += 1;
-                    // Loại bỏ user khỏi danh sách participants
                     yogaCourse.participants = yogaCourse.participants.filter(
                         participant => participant.toString() !== order.user.toString()
                     );
                     await yogaCourse.save();
                 }
 
-                // Loại bỏ khóa học khỏi danh sách courses của user
                 const user = await User.findById(order.user);
                 if (user) {
                     user.courses = user.courses.filter(
@@ -135,11 +130,9 @@ exports.updateOrderStatus = async (req, res) => {
             }
         }
 
-        // Cập nhật trạng thái đơn hàng
         order.status = status;
         await order.save();
 
-        // Nếu trạng thái mới là "Completed"
         if (status === 'Completed') {
             for (const item of order.items) {
                 const yogaCourse = await YogaCourse.findById(item.yogaCourse);

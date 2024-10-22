@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { fetchOrders } from '../apiRequest';
+import { fetchOrdersByUserId, fetchUserDetails } from '../apiRequest'; 
 
 const OrderScreen: React.FC = () => {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadOrders = async () => {
+        const loadUserAndOrders = async () => {
             try {
-                const data = await fetchOrders();
+                const user = await fetchUserDetails();
+                setUserId(user._id);
+
+                const data = await fetchOrdersByUserId(user._id);
                 setOrders(data);
             } catch (error: any) {
                 Alert.alert('Error', error.message);
@@ -18,7 +22,7 @@ const OrderScreen: React.FC = () => {
             }
         };
 
-        loadOrders();
+        loadUserAndOrders();
     }, []);
 
     if (loading) {

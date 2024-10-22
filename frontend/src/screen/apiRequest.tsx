@@ -203,11 +203,11 @@ export const createOrder = async () => {
   }
 };
 
-export const fetchOrders = async () => {
+export const fetchOrdersByUserId = async (userId: string) => {
   try {
-    const response = await axios.get(`${BASE_URL}/order`);
-    return response.data;
+      const response = await axios.get(`${BASE_URL}/order/user/${userId}`);
+      return response.data;
   } catch (error: any) {
-    throw new Error(error.response ? error.response.data.message : 'Failed to fetch orders');
+      throw new Error(error.response ? error.response.data.message : 'Failed to fetch orders');
   }
 };

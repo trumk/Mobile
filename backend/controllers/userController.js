@@ -69,15 +69,17 @@ exports.getUser = async (req, res) => {
                     select: 'typeName' 
                 }
             });
-
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+
         res.status(200).json({ user });
     } catch (error) {
-        res.status(500).json({ message: 'Error retrieving user information', error });
+        console.error('Error retrieving user information:', error);
+        res.status(500).json({ message: 'Error retrieving user information', error: error.message });
     }
 };
+
 
 
 exports.getAllUsers = async (req, res) => {
