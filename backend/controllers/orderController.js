@@ -96,10 +96,6 @@ exports.getOrderById = async (req, res) => {
 
 
 exports.updateOrderStatus = async (req, res) => {
-    if (!req.session.userId) {
-        return res.status(401).json({ message: 'User not authenticated' });
-    }
-
     const { orderId, status } = req.body;
 
     const validStatuses = ['Pending', 'Completed', 'Cancelled'];
@@ -113,9 +109,37 @@ exports.updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        // Nếu trạng thái hiện tại của đơn hàng là "Completed" và trạng thái mới là "Pending" hoặc "Cancelled"
+        if (order.status === 'Completed' && (status === 'Pending' || status === 'Cancelled')) {
+            for (const item of order.items) {
+                const yogaCourse = await YogaCourse.findById(item.yogaCourse);
+                
+                // Tăng capacity của khóa học
+                if (yogaCourse) {
+                    yogaCourse.capacity += 1;
+                    // Loại bỏ user khỏi danh sách participants
+                    yogaCourse.participants = yogaCourse.participants.filter(
+                        participant => participant.toString() !== order.user.toString()
+                    );
+                    await yogaCourse.save();
+                }
+
+                // Loại bỏ khóa học khỏi danh sách courses của user
+                const user = await User.findById(order.user);
+                if (user) {
+                    user.courses = user.courses.filter(
+                        courseId => courseId.toString() !== yogaCourse._id.toString()
+                    );
+                    await user.save();
+                }
+            }
+        }
+
+        // Cập nhật trạng thái đơn hàng
         order.status = status;
         await order.save();
 
+        // Nếu trạng thái mới là "Completed"
         if (status === 'Completed') {
             for (const item of order.items) {
                 const yogaCourse = await YogaCourse.findById(item.yogaCourse);
