@@ -45,16 +45,16 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
 
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
     const year = date.getUTCFullYear();
     const hours = date.getUTCHours() % 12 || 12;
-    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-    const amPm = date.getUTCHours() >= 12 ? 'PM' : 'AM';
-    
+    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+    const amPm = date.getUTCHours() >= 12 ? "PM" : "AM";
+
     return `${day}-${month}-${year} ${hours}:${minutes} ${amPm}`;
   };
-  
+
   const handleAddToCart = async (classTypeId: string, yogaCourseId: string) => {
     try {
       if (course.capacity === 0) {
@@ -67,7 +67,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       Alert.alert("Error", error.message || "Failed to add to cart.");
     }
   };
-  
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -118,7 +118,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
                 Date: {formatDateTime(classType.date)}
               </Text>
               <Text style={styles.classTypeText}>
-                Description: {classType.description || "No Description Available"}
+                Description:{" "}
+                {classType.description || "No Description Available"}
               </Text>
             </View>
             <TouchableOpacity
@@ -129,7 +130,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
               onPress={() => handleAddToCart(classType._id, course._id)}
               disabled={isFull}
             >
-              <Icon name="shopping-cart" size={24} color={isFull ? "#888" : "#4CAF50"} />
+              <Icon
+                name="shopping-cart"
+                size={24}
+                color={isFull ? "#888" : "#4CAF50"}
+              />
             </TouchableOpacity>
           </View>
         ))
@@ -139,20 +144,23 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
 
       <Text style={styles.participantsTitle}>Participants:</Text>
       {course.participants && course.participants.length > 0 ? (
-        course.participants.map((participant: any) => (
-          <Text key={participant._id} style={styles.participantText}>
-            {participant.username} - {participant.email}
+        course.participants.map((participant: string, index: number) => (
+          <Text key={index} style={styles.participantText}>
+            {participant}
           </Text>
         ))
       ) : (
         <Text style={styles.noParticipants}>No participants yet</Text>
       )}
-
       {isJoined && (
         <View style={styles.qrContainer}>
           <Text style={styles.qrText}>Your QR Code:</Text>
           <QRCode
-            value={`Course ID: ${course._id}\nCourse: ${course.dayOfWeek}\nLocation: ${course.location}\nDate: ${formatDateTime(course.classType[0]?.date)}\nPrice: $${course.pricePerClass}`}
+            value={`Course ID: ${course._id}\nCourse: ${
+              course.dayOfWeek
+            }\nLocation: ${course.location}\nDate: ${formatDateTime(
+              course.classType[0]?.date
+            )}\nPrice: $${course.pricePerClass}`}
             size={200}
             color="#1E5B75"
             backgroundColor="white"
@@ -232,9 +240,11 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   participantText: {
-    fontSize: 16,
-    color: "#555",
+    fontSize: 18,         
+    color: "#17c9f6",     
+    fontWeight: "bold",   
     lineHeight: 24,
+    marginBottom: 5,  
   },
   noParticipants: {
     fontSize: 16,
@@ -259,6 +269,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "red",
   },
+
 });
 
 export default CourseDetail;

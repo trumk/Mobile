@@ -1,6 +1,7 @@
 const YogaCourse = require("../models/YogaCourse");
 const User = require("../models/User");
 const ClassType = require("../models/ClassType");
+const mongoose = require("mongoose");
 
 exports.getAllCourses = async (req, res) => {
   try {
@@ -35,7 +36,7 @@ exports.getAllCourses = async (req, res) => {
 exports.detailCourse = async (req, res) => {
   try {
     const course = await YogaCourse.findById(req.params.id)
-      .populate("participants", "username") // Chỉ lấy `username` của `participants`
+      .populate("participants", "username") 
       .populate("classType");
 
     if (!course) {
@@ -44,14 +45,21 @@ exports.detailCourse = async (req, res) => {
 
     const participantsUsernames = course.participants.map(participant => participant.username);
 
+    let isJoined = false;
+    if (req.session.userId) {
+      isJoined = course.participants.some(participant => participant._id.toString() === req.session.userId);
+    }
+
     res.json({
       ...course.toObject(),
-      participants: participantsUsernames
+      participants: participantsUsernames,
+      isJoined
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 exports.detailCourse2 = async (req, res) => {
   try {
@@ -306,12 +314,12 @@ exports.addClassTypeToCourse = async (req, res) => {
 };
 
 exports.updateClassTypeInCourse = async (req, res) => {
-  const { classTypeId } = req.params;
+  const { id } = req.params;
   const { typeName, description, teacher, date, duration } = req.body;
 
   try {
     const updatedClassType = await ClassType.findByIdAndUpdate(
-      classTypeId,
+      id,
       { typeName, description, teacher, date, duration },
       { new: true }
     );
@@ -327,19 +335,43 @@ exports.updateClassTypeInCourse = async (req, res) => {
 };
 
 exports.removeClassTypeFromCourse = async (req, res) => {
-  const { courseId, classTypeId } = req.params;
+  let { courseId, id } = req.params;
+
+  if (!id) {
+      console.log("Received an undefined classTypeId");
+      return res.status(400).json({ message: "Class type ID is required" });
+  }
+
+  id = id.trim();
+
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.log("Invalid ClassType ID format:", id);
+      return res.status(400).json({ message: "Invalid Class type ID format" });
+  }
 
   try {
-    await ClassType.findByIdAndDelete(classTypeId);
+      const deletedClassType = await ClassType.findByIdAndDelete(id);
 
-    const course = await YogaCourse.findByIdAndUpdate(
-      courseId,
-      { $pull: { classType: classTypeId } },
-      { new: true }
-    ).populate("classType");
+      if (!deletedClassType) {
+          console.log("ClassType not found with ID:", id);
+          return res.status(404).json({ message: "Class type not found" });
+      }
 
-    res.json(course);
+      const course = await YogaCourse.findByIdAndUpdate(
+          courseId,
+          { $pull: { classType: id } },
+          { new: true }
+      ).populate("classType");
+
+      if (!course) {
+          return res.status(404).json({ message: "Course not found" });
+      }
+
+      res.json(course);
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+      console.log("Error in removeClassTypeFromCourse:", error.message);
+      res.status(500).json({ message: error.message });
   }
 };

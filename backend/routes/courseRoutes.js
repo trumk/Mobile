@@ -28,7 +28,7 @@ router.put('/courses/:id', updateCourse);
 router.delete('/courses/:id', deleteCourse); 
 
 router.post('/courses/:courseId/class', addClassTypeToCourse);           
-router.put('/courses/class/:classTypeId', updateClassTypeInCourse);      
+router.put('/courses/class/:id', updateClassTypeInCourse);      
 router.delete('/courses/:courseId/class/:id', removeClassTypeFromCourse);
 router.get('/courses/class/:id', getClassTypeById); 
 
