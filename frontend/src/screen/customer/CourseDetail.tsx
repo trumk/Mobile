@@ -14,7 +14,6 @@ import { RootStackParamList } from "../../../App";
 import { addToCart, fetchCourseDetails } from "../apiRequest";
 import QRCode from "react-native-qrcode-svg";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { format } from 'date-fns';
 
 type CourseDetailProps = {
   route: RouteProp<RootStackParamList, "Detail Course">;

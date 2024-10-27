@@ -5,7 +5,6 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const authRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes'); 
-const classRoutes = require('./routes/classRoutes'); 
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 require('dotenv').config();
@@ -27,7 +26,6 @@ app.use(session({
 
 app.use('/api/auth', authRoutes); 
 app.use('/api/admin', courseRoutes); 
-app.use('/api/class', classRoutes); 
 app.use('/api/cart', cartRoutes); 
 app.use('/api/order', orderRoutes); 
 
