@@ -278,7 +278,6 @@ exports.getClassTypeById = async (req, res) => {
   }
 };
 
-
 exports.addClassTypeToCourse = async (req, res) => {
   const { courseId } = req.params;
   const { typeName, description, teacher, date, duration } = req.body;
@@ -305,7 +304,6 @@ exports.addClassTypeToCourse = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
-
 
 exports.updateClassTypeInCourse = async (req, res) => {
   const { classTypeId } = req.params;
