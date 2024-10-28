@@ -5,6 +5,10 @@ const YogaCourseSchema = new mongoose.Schema({
         type: String, 
         required: true 
     },
+    timeOfCourse: {
+        type: String,
+        required: true,
+    },
     capacity: { 
         type: Number, 
         required: true 

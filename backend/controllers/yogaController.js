@@ -60,7 +60,6 @@ exports.detailCourse = async (req, res) => {
   }
 };
 
-
 exports.detailCourse2 = async (req, res) => {
   try {
     const includeParticipants = req.query.includeParticipants === 'true';
@@ -118,7 +117,7 @@ exports.checkClassTypesAvailability = async (req, res) => {
 };
 
 exports.createCourse = async (req, res) => {
-  const { dayOfWeek, capacity, pricePerClass, classType, location } = req.body;
+  const { dayOfWeek, timeOfCourse, capacity, pricePerClass, classType, location } = req.body;
 
   try {
     let classTypeIds = [];
@@ -138,6 +137,7 @@ exports.createCourse = async (req, res) => {
 
     const newCourse = new YogaCourse({
       dayOfWeek,
+      timeOfCourse,
       capacity,
       pricePerClass,
       classType: classTypeIds,
@@ -154,7 +154,7 @@ exports.createCourse = async (req, res) => {
 };
 
 exports.updateCourse = async (req, res) => {
-  const { classType, dayOfWeek, capacity, pricePerClass, location } = req.body;
+  const { classType, dayOfWeek, timeOfCourse, capacity, pricePerClass, location } = req.body;
 
   try {
     let updatedClassTypes = null;
@@ -176,6 +176,7 @@ exports.updateCourse = async (req, res) => {
 
     const updatedData = {
       dayOfWeek,
+      timeOfCourse,
       capacity,
       pricePerClass,
       location,
