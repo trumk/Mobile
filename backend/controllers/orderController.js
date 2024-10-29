@@ -33,7 +33,6 @@ exports.createOrder = async (req, res) => {
 
         await order.save();
 
-        // Xóa giỏ hàng sau khi tạo đơn hàng thành công
         await Cart.findOneAndDelete({ user: req.session.userId });
 
         res.status(201).json({ message: 'Order created successfully', order });
