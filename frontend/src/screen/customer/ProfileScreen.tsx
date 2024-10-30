@@ -78,9 +78,6 @@ const ProfileScreen: React.FC = () => {
           user.courses.map((course: any) => (
             <View key={course._id} style={styles.courseCard}>
               <Text style={styles.courseName}>
-                {course.classType?.[0]?.typeName || "Unknown Class Type"}
-              </Text>
-              <Text style={styles.courseDetail}>
                 Day of the Week: {course.dayOfWeek}
               </Text>
               <Text style={styles.courseDetail}>

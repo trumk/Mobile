@@ -201,13 +201,15 @@ exports.updateCourse = async (req, res) => {
   }
 };
 
-
 exports.deleteCourse = async (req, res) => {
   try {
-    const courseToDelete = await YogaCourse.findById(req.params.id);
+    const courseToDelete = await YogaCourse.findById(req.params.id).populate("classType");
     if (!courseToDelete) {
       return res.status(404).json({ message: "Course not found" });
     }
+
+    const classTypeIds = courseToDelete.classType.map(classType => classType._id);
+    await ClassType.deleteMany({ _id: { $in: classTypeIds } });
 
     await User.updateMany(
       { _id: { $in: courseToDelete.participants } },
@@ -216,7 +218,7 @@ exports.deleteCourse = async (req, res) => {
 
     await YogaCourse.findByIdAndDelete(req.params.id);
 
-    res.json({ message: "Course and participants successfully deleted" });
+    res.json({ message: "Course and associated classes successfully deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
