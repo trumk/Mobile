@@ -108,6 +108,7 @@ exports.updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        // Nếu order trước đó là "Completed", và bây giờ bị hủy hoặc đặt lại trạng thái "Pending"
         if (order.status === 'Completed' && (status === 'Pending' || status === 'Cancelled')) {
             for (const item of order.items) {
                 const yogaCourse = await YogaCourse.findById(item.yogaCourse);
@@ -141,9 +142,11 @@ exports.updateOrderStatus = async (req, res) => {
             }
         }
 
+        // Cập nhật trạng thái mới
         order.status = status;
         await order.save();
 
+        // Nếu order được đánh dấu là "Completed"
         if (status === 'Completed') {
             for (const item of order.items) {
                 const yogaCourse = await YogaCourse.findById(item.yogaCourse);
@@ -151,6 +154,13 @@ exports.updateOrderStatus = async (req, res) => {
 
                 if (yogaCourse && !yogaCourse.participants.includes(order.user)) {
                     yogaCourse.participants.push(order.user);
+
+                    if (cls && cls._id && !yogaCourse.class.includes(cls._id)) {
+                        yogaCourse.class.push(cls._id);
+                    }
+
+                    yogaCourse.class = yogaCourse.class.filter((clsId) => clsId !== null);
+
                     if (yogaCourse.capacity > 0) {
                         yogaCourse.capacity -= 1;
                     }
@@ -177,6 +187,7 @@ exports.updateOrderStatus = async (req, res) => {
 
         res.status(200).json({ message: 'Order status updated successfully', order });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error updating order status:', error);
+        res.status(500).json({ message: 'Failed to update order status', error: error.message });
     }
 };

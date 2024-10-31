@@ -25,7 +25,6 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isJoined, setIsJoined] = useState<boolean>(false);
   const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
@@ -33,7 +32,6 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       try {
         const data = await fetchCourseDetails(courseId);
         setCourse(data);
-        setIsJoined(data.isJoined || false);
       } catch (err) {
         setError("Could not fetch course details.");
       } finally {
@@ -126,22 +124,26 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
                 {classType.description || "No Description Available"}
               </Text>
             </View>
-            <TouchableOpacity
-              style={[
-                styles.addToCartButton,
-                isFull ? styles.disabledButton : {},
-              ]}
-              onPress={() =>
-                handleAddToCart(classType._id, course._id, course.pricePerClass)
-              }
-              disabled={isFull}
-            >
-              <Icon
-                name="shopping-cart"
-                size={24}
-                color={isFull ? "#888" : "#4CAF50"}
-              />
-            </TouchableOpacity>
+            {classType.isJoinClass ? (
+              <Text style={styles.alreadyJoinedText}>Already Joined</Text>
+            ) : (
+              <TouchableOpacity
+                style={[
+                  styles.addToCartButton,
+                  isFull ? styles.disabledButton : {},
+                ]}
+                onPress={() =>
+                  handleAddToCart(classType._id, course._id, course.pricePerClass)
+                }
+                disabled={isFull}
+              >
+                <Icon
+                  name="shopping-cart"
+                  size={24}
+                  color={isFull ? "#888" : "#4CAF50"}
+                />
+              </TouchableOpacity>
+            )}
           </View>
         ))
       ) : (
@@ -158,7 +160,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       ) : (
         <Text style={styles.noParticipants}>No participants yet</Text>
       )}
-      {isJoined && (
+
+      {course.isJoined && (
         <View style={styles.qrContainer}>
           <Text style={styles.qrText}>Your QR Code:</Text>
           <QRCode
@@ -262,6 +265,11 @@ const styles = StyleSheet.create({
   noParticipants: {
     fontSize: 16,
     color: "#bdc3c7",
+  },
+  alreadyJoinedText: {
+    fontSize: 16,
+    color: "#e74c3c",
+    fontWeight: "bold",
   },
   qrContainer: {
     marginTop: 30,

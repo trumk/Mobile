@@ -64,27 +64,44 @@ exports.getUser = async (req, res) => {
             .select('-password')
             .populate({
                 path: 'courses',
-                select: 'dayOfWeek timeOfCourse location pricePerClass typeOfClass', 
+                select: 'dayOfWeek timeOfCourse location pricePerClass typeOfClass class',
                 populate: {
                     path: 'class',
-                    select: 'className teacher date duration'
+                    select: 'className teacher date duration',
                 }
             })
             .populate({
                 path: 'classes',
-                select: 'className teacher date duration participants'
+                select: 'className teacher date duration participants',
             });
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({ user });
+        const filteredCourses = user.courses.map(course => {
+            const joinedClasses = course.class.filter(cls =>
+                user.classes.some(userClass => userClass._id.toString() === cls._id.toString())
+            );
+
+            return {
+                ...course.toObject(),
+                class: joinedClasses
+            };
+        });
+
+        res.status(200).json({
+            user: {
+                ...user.toObject(),
+                courses: filteredCourses,
+            }
+        });
     } catch (error) {
         console.error('Error retrieving user information:', error);
         res.status(500).json({ message: 'Error retrieving user information', error: error.message });
     }
 };
+
 
 exports.getAllUsers = async (req, res) => {
     try {

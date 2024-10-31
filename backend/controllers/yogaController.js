@@ -40,23 +40,44 @@ exports.detailCourse = async (req, res) => {
   try {
     const course = await YogaCourse.findById(req.params.id)
       .populate("participants", "username")
-      .populate("class");
+      .populate({
+        path: "class",
+        populate: {
+          path: "participants",
+          select: "_id",
+        },
+      });
 
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    const participantsUsernames = course.participants.map(participant => participant.username);
+    const participantsUsernames = course.participants.map(
+      (participant) => participant.username
+    );
 
     let isJoined = false;
     if (req.session.userId) {
-      isJoined = course.participants.some(participant => participant._id.toString() === req.session.userId);
+      isJoined = course.participants.some(
+        (participant) => participant._id.toString() === req.session.userId
+      );
     }
+
+    const classesWithJoinStatus = course.class.map((classItem) => {
+      const isJoinClass = classItem.participants.some(
+        (participant) => participant._id.toString() === req.session.userId
+      );
+      return {
+        ...classItem.toObject(),
+        isJoinClass,
+      };
+    });
 
     res.json({
       ...course.toObject(),
       participants: participantsUsernames,
-      isJoined
+      isJoined,
+      class: classesWithJoinStatus,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
