@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const ClassTypeSchema = new mongoose.Schema({
-    typeName: { 
+    className: { 
         type: String, 
         required: true 
     },
@@ -20,7 +20,12 @@ const ClassTypeSchema = new mongoose.Schema({
     duration: { 
         type: Number, 
         required: true 
-    }
+    },
+    participants: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+        default: []
+    }]
 });
 
-module.exports = mongoose.model('ClassType', ClassTypeSchema);
+module.exports = mongoose.model('Class', ClassTypeSchema);

@@ -2,6 +2,7 @@ const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 const User = require('../models/User');
 const YogaCourse = require('../models/YogaCourse');
+const Class = require('../models/Class');
 
 exports.createOrder = async (req, res) => {
     if (!req.session.userId) {
@@ -10,7 +11,7 @@ exports.createOrder = async (req, res) => {
 
     try {
         const cart = await Cart.findOne({ user: req.session.userId })
-            .populate('items.classType')
+            .populate('items.class')
             .populate('items.yogaCourse');
 
         if (!cart || cart.items.length === 0) {
@@ -25,7 +26,7 @@ exports.createOrder = async (req, res) => {
         const order = new Order({
             user: req.session.userId,
             items: cart.items.map(item => ({
-                classType: item.classType._id,
+                class: item.class._id,
                 yogaCourse: item.yogaCourse._id
             })),
             totalAmount
@@ -44,12 +45,12 @@ exports.createOrder = async (req, res) => {
 exports.getOrders = async (req, res) => {
     try {
         const orders = await Order.find()
-            .populate('items.classType') 
+            .populate('items.class') 
             .populate({
                 path: 'items.yogaCourse',
                 populate: {
-                    path: 'classType', 
-                    model: 'ClassType',
+                    path: 'class',
+                    model: 'Class',
                     select: '_id'
                 }
             });
@@ -73,12 +74,12 @@ exports.getOrdersByUserId = async (req, res) => {
 
     try {
         const orders = await Order.find({ user: userId })
-            .populate('items.classType') 
+            .populate('items.class')
             .populate({
                 path: 'items.yogaCourse',
                 populate: {
-                    path: 'classType',
-                    model: 'ClassType',
+                    path: 'class',
+                    model: 'Class',
                     select: '_id'
                 }
             });
@@ -102,7 +103,7 @@ exports.updateOrderStatus = async (req, res) => {
     }
 
     try {
-        const order = await Order.findById(orderId).populate('items.yogaCourse');
+        const order = await Order.findById(orderId).populate('items.yogaCourse items.class');
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
@@ -110,7 +111,8 @@ exports.updateOrderStatus = async (req, res) => {
         if (order.status === 'Completed' && (status === 'Pending' || status === 'Cancelled')) {
             for (const item of order.items) {
                 const yogaCourse = await YogaCourse.findById(item.yogaCourse);
-                
+                const cls = await Class.findById(item.class);
+
                 if (yogaCourse) {
                     yogaCourse.capacity += 1;
                     yogaCourse.participants = yogaCourse.participants.filter(
@@ -119,10 +121,20 @@ exports.updateOrderStatus = async (req, res) => {
                     await yogaCourse.save();
                 }
 
+                if (cls) {
+                    cls.participants = cls.participants.filter(
+                        participant => participant.toString() !== order.user.toString()
+                    );
+                    await cls.save();
+                }
+
                 const user = await User.findById(order.user);
                 if (user) {
                     user.courses = user.courses.filter(
                         courseId => courseId.toString() !== yogaCourse._id.toString()
+                    );
+                    user.classes = user.classes.filter(
+                        classId => classId.toString() !== cls._id.toString()
                     );
                     await user.save();
                 }
@@ -135,20 +147,29 @@ exports.updateOrderStatus = async (req, res) => {
         if (status === 'Completed') {
             for (const item of order.items) {
                 const yogaCourse = await YogaCourse.findById(item.yogaCourse);
+                const cls = await Class.findById(item.class);
 
                 if (yogaCourse && !yogaCourse.participants.includes(order.user)) {
                     yogaCourse.participants.push(order.user);
-                    await yogaCourse.save();
-
                     if (yogaCourse.capacity > 0) {
                         yogaCourse.capacity -= 1;
-                        await yogaCourse.save();
                     }
+                    await yogaCourse.save();
+                }
+
+                if (cls && !cls.participants.includes(order.user)) {
+                    cls.participants.push(order.user);
+                    await cls.save();
                 }
 
                 const user = await User.findById(order.user);
-                if (user && !user.courses.includes(yogaCourse._id)) {
-                    user.courses.push(yogaCourse._id);
+                if (user) {
+                    if (!user.courses.includes(yogaCourse._id)) {
+                        user.courses.push(yogaCourse._id);
+                    }
+                    if (!user.classes.includes(cls._id)) {
+                        user.classes.push(cls._id);
+                    }
                     await user.save();
                 }
             }

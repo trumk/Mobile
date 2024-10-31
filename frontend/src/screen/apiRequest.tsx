@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.1.10:5000/api'; 
+// const BASE_URL = 'http://192.168.1.10:5000/api'; 
+const BASE_URL = 'http://10.22.50.194:5000/api'; 
 
 export const login = async (username: string, password: string) => {
   try {
@@ -48,7 +49,6 @@ export const fetchUserDetails = async () => {
   }
 };
 
-
 export const fetchCourses = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/admin/courses`);
@@ -57,7 +57,6 @@ export const fetchCourses = async () => {
     throw new Error(error.response ? error.response.data.message : 'Failed to fetch courses');
   }
 };
-
 
 export const fetchCourseDetails = async (courseId: string) => {
   try {
@@ -176,9 +175,9 @@ export const fetchCart = async () => {
   }
 };
 
-export const addToCart = async (classTypeId: string, yogaCourseId: string) => {
+export const addToCart = async (classId: string, yogaCourseId: string, pricePerClass: number) => {
   try {
-    const response = await axios.post(`${BASE_URL}/cart/add`, { classTypeId, yogaCourseId });
+    const response = await axios.post(`${BASE_URL}/cart/add`, { classId, yogaCourseId, pricePerClass });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response ? error.response.data.message : 'Failed to add to cart');

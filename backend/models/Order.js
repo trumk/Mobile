@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const OrderItemSchema = new mongoose.Schema({
-    classType: { 
+    class: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'ClassType', 
+        ref: 'Class', 
         required: true 
     },
     yogaCourse: {

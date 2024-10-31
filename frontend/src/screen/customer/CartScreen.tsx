@@ -36,10 +36,10 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
     loadCart();
   }, []);
 
-  const handleRemoveFromCart = async (classTypeId: string) => {
+  const handleRemoveFromCart = async (classId: string) => {
     try {
-      await removeFromCart(classTypeId);
-      setCartItems(prevItems => prevItems.filter(item => item.classType._id !== classTypeId));
+      await removeFromCart(classId);
+      setCartItems(prevItems => prevItems.filter(item => item.class._id !== classId));
       Alert.alert('Success', 'Class removed from cart');
     } catch (error: any) {
       Alert.alert('Error', error.message);
@@ -90,14 +90,14 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
         <>
           <FlatList
             data={cartItems}
-            keyExtractor={(item) => item.classType._id}
+            keyExtractor={(item) => item.class._id}
             renderItem={({ item }) => (
               <View style={styles.cartItem}>
                 <View style={styles.itemDetails}>
-                  <Text style={styles.classTypeText}>{item.classType.typeName}</Text>
-                  <Text style={styles.detailText}>Teacher: {item.classType.teacher}</Text>
-                  <Text style={styles.classTypeText}>
-                    Date: {formatDateTime(item.classType.date)}
+                  <Text style={styles.classTypeText}>{item.class.className}</Text>
+                  <Text style={styles.detailText}>Teacher: {item.class.teacher}</Text>
+                  <Text style={styles.detailText}>
+                    Date: {formatDateTime(item.class.date)}
                   </Text>
                   <Text style={styles.detailText}>
                     Price per Class: ${(item.yogaCourse.pricePerClass || 0).toFixed(2)}
@@ -105,7 +105,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
                 </View>
                 <TouchableOpacity
                   style={styles.removeButton}
-                  onPress={() => handleRemoveFromCart(item.classType._id)}
+                  onPress={() => handleRemoveFromCart(item.class._id)}
                 >
                   <Text style={styles.removeButtonText}>Remove</Text>
                 </TouchableOpacity>

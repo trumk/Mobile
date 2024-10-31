@@ -19,13 +19,12 @@ const ProfileScreen: React.FC = () => {
       try {
         const fetchedUser = await fetchUserDetails();
         setUser(fetchedUser);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching user details:", error);
+      } finally {
         setLoading(false);
       }
     };
-
     getUserDetails();
   }, []);
 
@@ -68,27 +67,38 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.detailLabel}>Email:</Text>
           <Text style={styles.detailItem}>{user?.email}</Text>
         </View>
-        <View style={styles.detailItemWrapper}>
-          <Text style={styles.detailLabel}>Role:</Text>
-          <Text style={styles.detailItem}>{user?.role}</Text>
-        </View>
 
         <Text style={styles.sectionTitle}>Courses Enrolled</Text>
         {user?.courses && user.courses.length > 0 ? (
           user.courses.map((course: any) => (
             <View key={course._id} style={styles.courseCard}>
-              <Text style={styles.courseName}>
-                Day of the Week: {course.dayOfWeek}
-              </Text>
-              <Text style={styles.courseDetail}>
-                Location: {course.location}
-              </Text>
+              <Text style={styles.courseName}>Course: {course.typeOfClass}</Text>
+              <Text style={styles.courseDetail}>Location: {course.location}</Text>
               <Text style={styles.courseDetail}>
                 Price per Class: ${course.pricePerClass}
               </Text>
-              <Text style={styles.courseDetail}>
-                Participants: {course.participants.length}
-              </Text>
+              <Text style={styles.courseDetail}>Type: {course.typeOfClass}</Text>
+              {course.class && course.class.length > 0 && (
+                <View style={styles.classList}>
+                  <Text style={styles.classTitle}>Classes:</Text>
+                  {course.class.map((classItem: any) => (
+                    <View key={classItem._id} style={styles.classCard}>
+                      <Text style={styles.classDetail}>
+                        Class Name: {classItem.className}
+                      </Text>
+                      <Text style={styles.classDetail}>
+                        Teacher: {classItem.teacher}
+                      </Text>
+                      <Text style={styles.classDetail}>
+                        Date: {new Date(classItem.date).toLocaleDateString()}
+                      </Text>
+                      <Text style={styles.classDetail}>
+                        Duration: {classItem.duration} mins
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           ))
         ) : (
@@ -193,6 +203,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#777",
     marginTop: 5,
+  },
+  classList: {
+    marginTop: 10,
+  },
+  classTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#1e90ff",
+    marginBottom: 5,
+  },
+  classCard: {
+    backgroundColor: "#f4f4f8",
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 5,
+  },
+  classDetail: {
+    fontSize: 15,
+    color: "#555",
   },
   noCourses: {
     fontSize: 16,

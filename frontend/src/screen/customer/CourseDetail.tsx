@@ -55,13 +55,17 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
     return `${day}-${month}-${year} ${hours}:${minutes} ${amPm}`;
   };
 
-  const handleAddToCart = async (classTypeId: string, yogaCourseId: string) => {
+  const handleAddToCart = async (
+    classId: string,
+    yogaCourseId: string,
+    pricePerClass: number
+  ) => {
     try {
       if (course.capacity === 0) {
         Alert.alert("Cannot Add to Cart", "This class is fully booked.");
         return;
       }
-      await addToCart(classTypeId, yogaCourseId);
+      await addToCart(classId, yogaCourseId, pricePerClass);
       Alert.alert("Success", "Class added to cart");
     } catch (error: any) {
       Alert.alert("Error", error.message || "Failed to add to cart.");
@@ -106,11 +110,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
       </Text>
 
       <Text style={styles.sectionTitle}>Class Information:</Text>
-      {course.classType && course.classType.length > 0 ? (
-        course.classType.map((classType: any) => (
+      {course.class && course.class.length > 0 ? (
+        course.class.map((classType: any) => (
           <View key={classType._id} style={styles.classTypeCard}>
             <View style={styles.classTypeContent}>
-              <Text style={styles.classTypeText}>- {classType.typeName}</Text>
+              <Text style={styles.classTypeText}>- {classType.className}</Text>
               <Text style={styles.classTypeText}>
                 Teacher: {classType.teacher}
               </Text>
@@ -127,7 +131,9 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
                 styles.addToCartButton,
                 isFull ? styles.disabledButton : {},
               ]}
-              onPress={() => handleAddToCart(classType._id, course._id)}
+              onPress={() =>
+                handleAddToCart(classType._id, course._id, course.pricePerClass)
+              }
               disabled={isFull}
             >
               <Icon
@@ -159,7 +165,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ route, navigation }) => {
             value={`Course ID: ${course._id}\nCourse: ${
               course.dayOfWeek
             }\nLocation: ${course.location}\nDate: ${formatDateTime(
-              course.classType[0]?.date
+              course.class[0]?.date
             )}\nPrice: $${course.pricePerClass}`}
             size={200}
             color="#1E5B75"
@@ -175,7 +181,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f0f8ff",
+    backgroundColor: "#f7f9fc",
   },
   center: {
     flex: 1,
@@ -183,93 +189,105 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#4CAF50",
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#2c3e50",
     marginBottom: 15,
+    textAlign: "center",
   },
   details: {
     fontSize: 18,
     marginBottom: 10,
-    color: "#555",
+    color: "#34495e",
     lineHeight: 22,
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: "700",
-    color: "#4CAF50",
+    fontWeight: "bold",
+    color: "#3498db",
     marginVertical: 20,
+    textTransform: "uppercase",
+    letterSpacing: 1,
   },
   classTypeCard: {
     flexDirection: "row",
     backgroundColor: "#ffffff",
-    padding: 15,
-    borderRadius: 10,
+    padding: 20,
+    borderRadius: 12,
     marginBottom: 15,
     elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
     alignItems: "center",
     justifyContent: "space-between",
+    borderLeftWidth: 5,
+    borderLeftColor: "#3498db",
   },
   classTypeContent: {
     flex: 1,
   },
   classTypeText: {
     fontSize: 16,
-    color: "#333",
+    color: "#2c3e50",
     marginBottom: 5,
   },
   addToCartButton: {
-    marginLeft: 15,
+    padding: 10,
+    borderRadius: 50,
+    backgroundColor: "#eaf2f8",
   },
   disabledButton: {
     opacity: 0.6,
   },
   noClassTypeText: {
     fontSize: 16,
-    color: "#888",
+    color: "#bdc3c7",
     textAlign: "center",
   },
   participantsTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#4CAF50",
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#3498db",
     marginVertical: 20,
   },
   participantText: {
-    fontSize: 18,         
-    color: "#17c9f6",     
-    fontWeight: "bold",   
+    fontSize: 18,
+    color: "#27ae60",
+    fontWeight: "500",
     lineHeight: 24,
-    marginBottom: 5,  
+    marginBottom: 5,
   },
   noParticipants: {
     fontSize: 16,
-    color: "#888",
+    color: "#bdc3c7",
   },
   qrContainer: {
     marginTop: 30,
     alignItems: "center",
     paddingVertical: 20,
+    paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#ecf0f1",
     borderRadius: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
   },
   qrText: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#4CAF50",
+    color: "#3498db",
     marginBottom: 10,
   },
   errorText: {
     fontSize: 18,
-    color: "red",
+    color: "#e74c3c",
   },
-
 });
 
 export default CourseDetail;

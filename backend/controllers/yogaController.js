@@ -1,14 +1,14 @@
 const YogaCourse = require("../models/YogaCourse");
 const User = require("../models/User");
-const ClassType = require("../models/ClassType");
+const Class = require("../models/Class");
 const mongoose = require("mongoose");
 
 exports.getAllCourses = async (req, res) => {
   try {
     const courses = await YogaCourse.find().populate({
-      path: "classType",
-      model: "ClassType",
-      select: "typeName description teacher date duration",
+      path: "class",
+      model: "Class",
+      select: "className description teacher date duration",
     });
 
     let userCourses = [];
@@ -19,15 +19,18 @@ exports.getAllCourses = async (req, res) => {
       }
     }
 
-    const coursesWithIsJoined = courses.map((course) => {
+    const coursesWithDetails = courses.map((course) => {
       const isJoined = userCourses.includes(course._id.toString());
+      const participantCount = course.participants ? course.participants.length : 0;
+
       return {
         ...course.toObject(),
         isJoined,
+        participantCount,
       };
     });
 
-    res.json(coursesWithIsJoined);
+    res.json(coursesWithDetails);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -36,8 +39,8 @@ exports.getAllCourses = async (req, res) => {
 exports.detailCourse = async (req, res) => {
   try {
     const course = await YogaCourse.findById(req.params.id)
-      .populate("participants", "username") 
-      .populate("classType");
+      .populate("participants", "username")
+      .populate("class");
 
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
@@ -63,8 +66,12 @@ exports.detailCourse = async (req, res) => {
 exports.detailCourse2 = async (req, res) => {
   try {
     const includeParticipants = req.query.includeParticipants === 'true';
+
     const query = YogaCourse.findById(req.params.id)
-      .populate("classType");
+      .populate({
+        path: "class",
+        select: "className description teacher date duration participants"
+      });
 
     if (includeParticipants) {
       query.populate("participants", "username");
@@ -93,59 +100,24 @@ exports.detailCourse2 = async (req, res) => {
 };
 
 
-exports.checkClassTypesAvailability = async (req, res) => {
-  const classTypeIds = req.body.classType.map((ct) => ct._id);
-  const excludeCourseId = req.query.excludeCourseId || null;
-
-  try {
-    const existingCourse = await YogaCourse.findOne({
-      classType: { $in: classTypeIds },
-      ...(excludeCourseId && { _id: { $ne: excludeCourseId } }),
-    });
-
-    if (existingCourse) {
-      return res.status(400).json({
-        message:
-          "One or more selected class types are already assigned to another course",
-      });
-    }
-
-    res.status(200).json({ message: "All selected class types are available" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 exports.createCourse = async (req, res) => {
-  const { dayOfWeek, timeOfCourse, capacity, pricePerClass, classType, location } = req.body;
+  const { dayOfWeek, timeOfCourse, capacity, pricePerClass, typeOfClass, location, class: classes } = req.body;
 
   try {
-    let classTypeIds = [];
-    
-    if (classType && Array.isArray(classType) && classType.length > 0) {
-      classTypeIds = classType.map((ct) => ct._id);
-      const existingCourse = await YogaCourse.findOne({
-        classType: { $in: classTypeIds },
-      });
-      if (existingCourse) {
-        return res.status(400).json({
-          message:
-            "One or more selected class types are already assigned to another course",
-        });
-      }
-    }
+    const classIds = classes && classes.length > 0 ? classes.map(ct => ct._id) : [];
 
     const newCourse = new YogaCourse({
       dayOfWeek,
       timeOfCourse,
       capacity,
       pricePerClass,
-      classType: classTypeIds,
+      typeOfClass,
       location,
+      class: classIds,
     });
 
     await newCourse.save();
-    await newCourse.populate("classType");
+    await newCourse.populate("class");
 
     res.status(201).json(newCourse);
   } catch (error) {
@@ -154,40 +126,26 @@ exports.createCourse = async (req, res) => {
 };
 
 exports.updateCourse = async (req, res) => {
-  const { classType, dayOfWeek, timeOfCourse, capacity, pricePerClass, location } = req.body;
+  const { dayOfWeek, timeOfCourse, capacity, pricePerClass, typeOfClass, location, class: classes } = req.body;
 
   try {
-    let updatedClassTypes = null;
-
-    if (classType && Array.isArray(classType) && classType.length > 0) {
-      const classTypeIds = classType.map((ct) => ct._id);
-      const existingCourse = await YogaCourse.findOne({
-        classType: { $in: classTypeIds },
-        _id: { $ne: req.params.id },
-      });
-      if (existingCourse) {
-        return res.status(400).json({
-          message:
-            "One or more selected class types are already assigned to another course",
-        });
-      }
-      updatedClassTypes = classTypeIds;
-    }
+    const classIds = classes && classes.length > 0 ? classes.map(ct => ct._id) : null;
 
     const updatedData = {
       dayOfWeek,
       timeOfCourse,
       capacity,
       pricePerClass,
+      typeOfClass,
       location,
-      ...(updatedClassTypes && { classType: updatedClassTypes })
+      ...(classIds && { class: classIds })
     };
 
     const updatedCourse = await YogaCourse.findByIdAndUpdate(
       req.params.id,
       updatedData,
       { new: true }
-    ).populate("classType");
+    ).populate("class");
 
     if (!updatedCourse) {
       return res.status(404).json({ message: "Course not found" });
@@ -195,21 +153,19 @@ exports.updateCourse = async (req, res) => {
     
     res.json(updatedCourse);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Failed to update course", error: error.message });
+    res.status(400).json({ message: "Failed to update course", error: error.message });
   }
 };
 
 exports.deleteCourse = async (req, res) => {
   try {
-    const courseToDelete = await YogaCourse.findById(req.params.id).populate("classType");
+    const courseToDelete = await YogaCourse.findById(req.params.id).populate("class");
     if (!courseToDelete) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    const classTypeIds = courseToDelete.classType.map(classType => classType._id);
-    await ClassType.deleteMany({ _id: { $in: classTypeIds } });
+    const classIds = courseToDelete.class.map(classItem => classItem._id);
+    await Class.deleteMany({ _id: { $in: classIds } });
 
     await User.updateMany(
       { _id: { $in: courseToDelete.participants } },
@@ -233,13 +189,13 @@ exports.searchCourses = async (req, res) => {
   }
 
   try {
-    const courses = await YogaCourse.find(filters).populate("classType");
+    const courses = await YogaCourse.find(filters).populate("class");
 
     const filteredCourses = courses.filter(
       (course) =>
         !teacherName ||
-        course.classType.some((ct) =>
-          ct.teacher.match(new RegExp(teacherName, "i"))
+        course.class.some((cls) =>
+          cls.teacher.match(new RegExp(teacherName, "i"))
         )
     );
 
@@ -265,50 +221,49 @@ exports.filterCourses = async (req, res) => {
   }
 };
 
-exports.getAllClassTypes = async (req, res) => {
+exports.getAllClasses = async (req, res) => {
   try {
-    const classTypes = await ClassType.find();
-    res.json(classTypes);
+    const classes = await Class.find();
+    res.json(classes);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-
-exports.getClassTypeById = async (req, res) => {
+exports.getClassById = async (req, res) => {
   try {
-    const classType = await ClassType.findById(req.params.classTypeId);
+    const cls = await Class.findById(req.params.classId);
 
-    if (!classType) {
-      return res.status(404).json({ message: "Class type not found" });
+    if (!cls) {
+      return res.status(404).json({ message: "Class not found" });
     }
 
-    res.json(classType);
+    res.json(cls);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-exports.addClassTypeToCourse = async (req, res) => {
+exports.addClassToCourse = async (req, res) => {
   const { courseId } = req.params;
-  const { typeName, description, teacher, date, duration } = req.body;
+  const { className, description, teacher, date, duration } = req.body;
 
   try {
-    const newClassType = new ClassType({
-      typeName,
+    const newClass = new Class({
+      className,
       description,
       teacher,
       date,
       duration,
     });
 
-    await newClassType.save();
+    await newClass.save();
 
     const updatedCourse = await YogaCourse.findByIdAndUpdate(
       courseId,
-      { $push: { classType: newClassType._id } }, 
+      { $push: { class: newClass._id } },
       { new: true }
-    ).populate("classType"); 
+    ).populate("class");
 
     res.status(201).json(updatedCourse);
   } catch (error) {
@@ -316,65 +271,63 @@ exports.addClassTypeToCourse = async (req, res) => {
   }
 };
 
-exports.updateClassTypeInCourse = async (req, res) => {
+exports.updateClassInCourse = async (req, res) => {
   const { id } = req.params;
-  const { typeName, description, teacher, date, duration } = req.body;
+  const { className, description, teacher, date, duration } = req.body;
 
   try {
-    const updatedClassType = await ClassType.findByIdAndUpdate(
+    const updatedClass = await Class.findByIdAndUpdate(
       id,
-      { typeName, description, teacher, date, duration },
+      { className, description, teacher, date, duration },
       { new: true }
     );
 
-    if (!updatedClassType) {
-      return res.status(404).json({ message: "Class type not found" });
+    if (!updatedClass) {
+      return res.status(404).json({ message: "Class not found" });
     }
 
-    res.json(updatedClassType);
+    res.json(updatedClass);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-exports.removeClassTypeFromCourse = async (req, res) => {
+exports.removeClassFromCourse = async (req, res) => {
   let { courseId, id } = req.params;
 
   if (!id) {
-      console.log("Received an undefined classTypeId");
-      return res.status(400).json({ message: "Class type ID is required" });
+    console.log("Received an undefined classId");
+    return res.status(400).json({ message: "Class ID is required" });
   }
 
   id = id.trim();
 
-
   if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.log("Invalid ClassType ID format:", id);
-      return res.status(400).json({ message: "Invalid Class type ID format" });
+    console.log("Invalid Class ID format:", id);
+    return res.status(400).json({ message: "Invalid Class ID format" });
   }
 
   try {
-      const deletedClassType = await ClassType.findByIdAndDelete(id);
+    const deletedClass = await Class.findByIdAndDelete(id);
 
-      if (!deletedClassType) {
-          console.log("ClassType not found with ID:", id);
-          return res.status(404).json({ message: "Class type not found" });
-      }
+    if (!deletedClass) {
+      console.log("Class not found with ID:", id);
+      return res.status(404).json({ message: "Class not found" });
+    }
 
-      const course = await YogaCourse.findByIdAndUpdate(
-          courseId,
-          { $pull: { classType: id } },
-          { new: true }
-      ).populate("classType");
+    const course = await YogaCourse.findByIdAndUpdate(
+      courseId,
+      { $pull: { class: id } },
+      { new: true }
+    ).populate("class");
 
-      if (!course) {
-          return res.status(404).json({ message: "Course not found" });
-      }
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
 
-      res.json(course);
-
+    res.json(course);
   } catch (error) {
-      console.log("Error in removeClassTypeFromCourse:", error.message);
-      res.status(500).json({ message: error.message });
+    console.log("Error in removeClassFromCourse:", error.message);
+    res.status(500).json({ message: error.message });
   }
 };

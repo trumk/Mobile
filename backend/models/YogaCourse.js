@@ -17,9 +17,13 @@ const YogaCourseSchema = new mongoose.Schema({
         type: Number, 
         required: true 
     },
-    classType: [{ 
+    typeOfClass: { 
+        type: String, 
+        required: true 
+    },
+    class: [{ 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'ClassType', 
+        ref: 'Class', 
         required: true 
     }],
     location: { 
@@ -28,7 +32,8 @@ const YogaCourseSchema = new mongoose.Schema({
     },
     participants: [{ 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User' 
+        ref: 'User',
+        default: [] 
     }]
 });
 
