@@ -6,7 +6,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { YogaCourse } from '../../../types';
 import { fetchCourses, filterYogaCourses } from '../apiRequest';
 import { RootStackParamList } from '../../../App';
-import Filter from '../../components/Filter';
 
 type CourseListProps = {
     navigation: StackNavigationProp<RootStackParamList, 'Detail Course'>;
@@ -24,21 +23,6 @@ const CourseList: React.FC<CourseListProps> = ({ navigation }) => {
         }
     };
 
-    const handleFilter = async (dayOfWeek: string) => {
-        try {
-            if (dayOfWeek === '') {
-                await loadCourses();
-            } else {
-                console.log('Filtering by dayOfWeek:', dayOfWeek);
-                const data = await filterYogaCourses(dayOfWeek);
-                console.log('Filtered data:', data);
-                setCourses(data);
-            }
-        } catch (error) {
-            console.error('Failed to filter courses:', error);
-        }
-    };
-
     useFocusEffect(
         useCallback(() => {
             loadCourses();
@@ -48,7 +32,6 @@ const CourseList: React.FC<CourseListProps> = ({ navigation }) => {
     return (
         <View style={styles.screenContainer}>
             <Text style={styles.screenTitle}>Yoga Course List</Text>
-            <Filter onFilter={handleFilter} />
             <YogaCourseList courses={courses} navigation={navigation} />
         </View>
     );

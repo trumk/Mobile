@@ -35,6 +35,17 @@ const ProfileScreen: React.FC = () => {
       </View>
     );
   }
+  const formatDateTime = (isoString: string) => {
+    const date = new Date(isoString);
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const year = date.getUTCFullYear();
+    const hours = date.getUTCHours() % 12 || 12;
+    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+    const amPm = date.getUTCHours() >= 12 ? "PM" : "AM";
+
+    return `${day}-${month}-${year} ${hours}:${minutes} ${amPm}`;
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -90,7 +101,7 @@ const ProfileScreen: React.FC = () => {
                         Teacher: {classItem.teacher}
                       </Text>
                       <Text style={styles.classDetail}>
-                        Date: {new Date(classItem.date).toLocaleDateString()}
+                        Date: {formatDateTime(classItem.date)}
                       </Text>
                       <Text style={styles.classDetail}>
                         Duration: {classItem.duration} mins
