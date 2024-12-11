@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const YogaCourseSchema = new mongoose.Schema({
     dayOfWeek: { 
-        type: String, 
+        type: [String], 
         required: true 
     },
     timeOfCourse: {

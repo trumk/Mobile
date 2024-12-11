@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.1.10:5000/api'; 
+const BASE_URL = 'http://10.22.48.213:5000/api'; 
 
 export const login = async (username: string, password: string) => {
   try {
@@ -183,14 +183,17 @@ export const addToCart = async (classId: string, yogaCourseId: string, pricePerC
   }
 };
 
-export const removeFromCart = async (classTypeId: string) => {
+export const removeFromCart = async (classId: string) => {
   try {
-    const response = await axios.post(`${BASE_URL}/cart/remove`, { classTypeId });
+    const response = await axios.delete(`${BASE_URL}/cart/remove`, {
+      data: { classId }, 
+    });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response ? error.response.data.message : 'Failed to remove from cart');
   }
 };
+
 
 export const createOrder = async () => {
   try {

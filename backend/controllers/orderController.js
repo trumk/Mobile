@@ -108,7 +108,6 @@ exports.updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // Nếu order trước đó là "Completed", và bây giờ bị hủy hoặc đặt lại trạng thái "Pending"
         if (order.status === 'Completed' && (status === 'Pending' || status === 'Cancelled')) {
             for (const item of order.items) {
                 const yogaCourse = await YogaCourse.findById(item.yogaCourse);

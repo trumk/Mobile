@@ -128,7 +128,7 @@ exports.createCourse = async (req, res) => {
     const classIds = classes && classes.length > 0 ? classes.map(ct => ct._id) : [];
 
     const newCourse = new YogaCourse({
-      dayOfWeek,
+      dayOfWeek: Array.isArray(dayOfWeek) ? dayOfWeek : [dayOfWeek], 
       timeOfCourse,
       capacity,
       pricePerClass,
@@ -153,13 +153,13 @@ exports.updateCourse = async (req, res) => {
     const classIds = classes && classes.length > 0 ? classes.map(ct => ct._id) : null;
 
     const updatedData = {
-      dayOfWeek,
-      timeOfCourse,
-      capacity,
-      pricePerClass,
-      typeOfClass,
-      location,
-      ...(classIds && { class: classIds })
+      ...(dayOfWeek && { dayOfWeek: Array.isArray(dayOfWeek) ? dayOfWeek : [dayOfWeek] }), 
+      ...(timeOfCourse && { timeOfCourse }),
+      ...(capacity && { capacity }),
+      ...(pricePerClass && { pricePerClass }),
+      ...(typeOfClass && { typeOfClass }),
+      ...(location && { location }),
+      ...(classIds && { class: classIds }),
     };
 
     const updatedCourse = await YogaCourse.findByIdAndUpdate(
@@ -171,7 +171,7 @@ exports.updateCourse = async (req, res) => {
     if (!updatedCourse) {
       return res.status(404).json({ message: "Course not found" });
     }
-    
+
     res.json(updatedCourse);
   } catch (error) {
     res.status(400).json({ message: "Failed to update course", error: error.message });
